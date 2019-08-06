@@ -1,34 +1,32 @@
-import {ServerConnection} from './ServerConnection';
-import {ClientConnection} from './ClientConnection';
+import { ServerConnection } from './ServerConnection'
+import { ClientConnection } from './ClientConnection'
 
-type Connection = ServerConnection | ClientConnection;
+type Connection = ServerConnection | ClientConnection
 
 export class Operator {
+  private connections: Array<ServerConnection> = []
 
-  private connections: Array<ServerConnection> = [];
+  constructor() {}
 
-  constructor() {
-  }
-
-  public connect(frame?: HTMLIFrameElement, options: any = {}): Connection{
-    let connection: Connection;
-    if(frame) {
-      connection = new ServerConnection(frame, options);
-      this.connections.push(connection);
+  public connect(frame?: HTMLIFrameElement, options: any = {}): Connection {
+    let connection: Connection
+    if (frame) {
+      connection = new ServerConnection(frame, options)
+      this.connections.push(connection)
     } else {
-      connection = new ClientConnection(options);
+      connection = new ClientConnection(options)
     }
-    return connection;
+    return connection
   }
 
   public close(connection: Connection) {
-    this.connections = this.connections.filter((c: Connection) => c !== connection);
-    connection.close();
+    this.connections = this.connections.filter((c: Connection) => c !== connection)
+    connection.close()
   }
 
-  public emit(event: string, payload: any) {
-    this.connections.forEach((connection:ServerConnection)=>{
-      connection.emit(event, payload);
-    });
+  public emit(event: string, payload?: any) {
+    this.connections.forEach((connection: ServerConnection) => {
+      connection.emit(event, payload)
+    })
   }
 }

@@ -1,57 +1,52 @@
-interface Promises {
+export interface Promises {
   [key: string]: MPromise
 }
 
-interface MPromise {
+export interface MPromise {
   resolve: Function
   reject: Function
 }
 
-interface Emits {
+export interface Emits {
   [key: string]: Function
 }
 
-interface EmitMessage {
+export interface EmitMessage {
   type: MESSAGE_TYPE.EMIT
   event: string
   payload?: any
 }
 
-interface SubscriptionMessage {
-  type: MESSAGE_TYPE.SUBSCRIBE
-  event: string
-}
-
-interface RequestMessage {
+export interface RequestMessage {
   type: MESSAGE_TYPE.REQUEST
   id: string
   event: string
   payload?: any
 }
 
-interface ResolveMessage {
+export interface ResolveMessage {
   type: MESSAGE_TYPE.RESOLVE
   id: string
   event: string
   payload: any
 }
 
-interface RejectMessage {
+export interface RejectMessage {
   type: MESSAGE_TYPE.REJECT
   id: string
   event: string
   payload: any
 }
 
-interface Options {
+export interface Options {
   timeout?: number
   debug?: boolean
   onload?: boolean
 }
 
-type Message = ResolveMessage | RejectMessage | SubscriptionMessage | EmitMessage | RequestMessage
+type Message = ResolveMessage | RejectMessage | EmitMessage | RequestMessage
 
-enum MESSAGE_TYPE {
+export enum MESSAGE_TYPE {
   CONNECTION = 'connection',
   SUBSCRIBE = 'subscribe',
   EMIT = 'emit',
@@ -61,13 +56,11 @@ enum MESSAGE_TYPE {
 }
 
 export class Connection {
-  public id!: string
   public initiated: boolean = false
   protected port!: MessagePort
   private backlog: Array<Message> = []
   private promises: Promises = {}
   private emitters: Emits = {}
-  private theirSubscriptions: Array<String> = []
   private readonly timeout: number = 100
   protected readonly defaultOptions: Options = {
     timeout: 2000,
@@ -80,16 +73,17 @@ export class Connection {
   }
 
   protected initConnection() {
-    if(this.port) {
+    if (this.port) {
       this.port.onmessage = message => {
-        this.handleMessage(message.data);
+        this.handleMessage(message.data)
       }
-      this.port.onmessageerror = error =>{
-        this.handleError(error);
+      this.port.onmessageerror = error => {
+        this.handleError(error)
       }
     }
     this.initiated = true
-    this.completeBacklog();
+    this.emit('mio-connected')
+    this.completeBacklog()
   }
 
   protected completeBacklog() {
@@ -99,9 +93,9 @@ export class Connection {
     this.backlog = []
   }
 
-  protected handleError(error: any){
-    if(this.options.debug) {
-      console.error(error);
+  protected handleError(error: any) {
+    if (this.options.debug) {
+      console.error(error)
     }
   }
 
@@ -157,7 +151,7 @@ export class Connection {
     }
   }
 
-  public emit(event: string, payload: any) {
+  public emit(event: string, payload?: any) {
     this.message({
       type: MESSAGE_TYPE.EMIT,
       event,
@@ -191,20 +185,22 @@ export class Connection {
       const ct = setTimeout(() => reject('timeout'), this.getTimeout(timeout))
       this.promises[uuid] = {
         resolve: (resolvedData: any) => {
-          resolve(resolvedData);
-          clearTimeout(ct);
+          resolve(resolvedData)
+          clearTimeout(ct)
         },
         reject: (error: any) => {
-          reject(error);
-          clearTimeout(ct);
+          reject(error)
+          clearTimeout(ct)
         }
       }
       this.message({ type: MESSAGE_TYPE.REQUEST, event: event, id: uuid, payload })
     })
   }
 
-  public close(){
-    this.port.close();
+  public close() {
+    if (this.initiated) {
+      this.port.close()
+    }
   }
 
   private message(message: Message) {
