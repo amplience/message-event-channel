@@ -112,7 +112,7 @@ mio.close(connection);
 
 
 # Options
-```json
+```js
 {
   targetOrigin: '*' // limit the connection to a particular origin (reccomended)
   onload: true, // if the connection should be initialised by an onload event or manually
