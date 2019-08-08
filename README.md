@@ -1,11 +1,11 @@
 # message.io
 
-An event driven fault tollerant library for communicating between contexts using MessageChannel.
+An event driven fault tolerant library for communicating between contexts using MessageChannel.
 
 # Features
 
 * Subscribe to and broadcast events
-* Send and recieve JSON
+* Send and receive JSON
 * Make requests that return a promise
 
 # Installation

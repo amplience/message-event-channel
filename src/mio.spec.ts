@@ -1,6 +1,6 @@
 import mio from './mio';
 import { Operator } from './Operator';
-import { Connection } from './Connection';
+import { Connection, MIO_EVENTS } from './Connection';
 describe('mio', () => {
   it('should be an instance of Operator', () => {
     expect(mio instanceof Operator).toBeTruthy();
@@ -16,7 +16,7 @@ describe('mio', () => {
     document.body.appendChild(frame);
     const connection = mio.connect(frame);
     frame.src = './base/src/frame.html';
-    connection.on('mio-connected', (data: any) => {
+    connection.on(MIO_EVENTS.CONNECTED, (data: any) => {
       expect(data).toBeUndefined();
       document.body.removeChild(frame);
       done();
@@ -32,7 +32,7 @@ describe('mio', () => {
     document.body.appendChild(frame);
     const connection = mio.connect(frame);
     frame.src = './base/src/frame.html';
-    connection.request('request-data-passthrough-success', requestJSON).then(dataReturned => {
+    connection.request('passthrough', requestJSON).then(dataReturned => {
       expect(dataReturned).toEqual(requestJSON);
       document.body.removeChild(frame);
       done();
@@ -48,7 +48,7 @@ describe('mio', () => {
     document.body.appendChild(frame);
     const connection = mio.connect(frame);
     frame.src = './base/src/frame.html';
-    connection.request('request-data-passthrough-fail', requestJSON).catch(error => {
+    connection.request('passthrough-fail', requestJSON).catch(error => {
       expect(error).toEqual(requestJSON);
       document.body.removeChild(frame);
       done();

@@ -1,12 +1,36 @@
-import { Connection, MESSAGE_TYPE, EmitMessage } from './Connection';
+import { Connection, MESSAGE_TYPE, MIO_EVENTS, EmitMessage } from './Connection';
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
     super(options);
-    this.setupChannel();
     if (this.options.onload) {
-      frame.addEventListener('load', () => this.init());
+      frame.addEventListener('load', () => this.startInit());
     }
+  }
+
+  public startInit() {
+    if (!this.frame.contentWindow || !this.frame.src) {
+      return false;
+    }
+    this.setupChannel();
+    this.initPortEvents();
+    this.listenForHandshake();
+    this.sendPortToClient();
+  }
+
+  private sendPortToClient() {
+    if (!this.frame.contentWindow || !this.frame.src) {
+      return false;
+    }
+    this.frame.contentWindow.postMessage(null, this.options.targetOrigin, [this.channel.port2]);
+  }
+
+  private listenForHandshake() {
+    this.on(MIO_EVENTS.HANDSHAKE, (payload: any, resolve: Function) => {
+      this.addBeforeUnloadEvent();
+      this.finishInit();
+      resolve(payload);
+    });
   }
 
   public setupChannel() {
@@ -14,23 +38,21 @@ export class ServerConnection extends Connection {
     this.port = this.channel.port1;
   }
 
-  private connectionReset() {
+  private connectionLost() {
+    this.initiated = false;
     const resetMessage: EmitMessage = {
       type: MESSAGE_TYPE.EMIT,
-      event: 'mio-connection-reset'
+      event: MIO_EVENTS.DISCONNECTED
     };
     this.handleMessage(resetMessage);
-    this.setupChannel();
   }
 
-  public init() {
-    if (this.frame.contentWindow && this.frame.src) {
-      this.frame.contentWindow.addEventListener('beforeunload', () => {
-        this.connectionReset();
-      });
-      this.frame.contentWindow.postMessage(null, this.options.targetOrigin, [this.channel.port2]);
-      this.initConnection();
+  protected addBeforeUnloadEvent() {
+    if (!this.frame.contentWindow) {
+      return false;
     }
-    return this;
+    this.frame.contentWindow.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+      this.connectionLost();
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { ClientConnection } from '../src/ClientConnection';
 import { ServerConnection } from '../src/ServerConnection';
-
+import { MIO_EVENTS } from '../src/Connection';
 beforeAll(() => {});
 
 declare global {
@@ -48,7 +48,7 @@ describe('Client', () => {
       const window: Window = frame.contentWindow;
       clientRemove = spyOn(window, 'removeEventListener');
     };
-    connection.on('mio-connected', () => {
+    connection.on(MIO_EVENTS.CONNECTED, () => {
       expect(clientRemove).toHaveBeenCalled();
       expect(clientRemove).toHaveBeenCalledTimes(1);
       expect(clientRemove).toHaveBeenCalledWith('message', jasmine.any(Function));
@@ -58,7 +58,7 @@ describe('Client', () => {
     frame.src = './base/src/frame.html';
   });
 
-  it('should recieve a message from the parent', done => {
+  it('should receive a message from the parent', done => {
     const frame: HTMLIFrameElement = document.createElement('iframe');
     const connection = new ServerConnection(frame);
     document.body.appendChild(frame);
@@ -77,7 +77,7 @@ describe('Client', () => {
     frame.src = './base/src/frame.html';
   });
 
-  it('should recieve a message from the parent with data', done => {
+  it('should receive a message from the parent with data', done => {
     const frame: HTMLIFrameElement = document.createElement('iframe');
     const connection = new ServerConnection(frame);
     const payload = { hello: 'there' };

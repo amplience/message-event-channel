@@ -56,11 +56,17 @@ export enum MESSAGE_TYPE {
   REJECT = 'reject'
 }
 
+export enum MIO_EVENTS {
+  HANDSHAKE = 'mio-handshake',
+  CONNECTED = 'mio-connected',
+  DISCONNECTED = 'mio-disconnected'
+}
+
 export class Connection {
   public initiated: boolean = false;
   protected port!: MessagePort;
   private backlog: Array<Message> = [];
-  private promises: Promises = {};
+  protected promises: Promises = {};
   private emitters: Emits = {};
   private readonly timeout: number = 100;
   protected readonly defaultOptions: Options = {
@@ -74,18 +80,19 @@ export class Connection {
     this.options = { ...this.defaultOptions, ...options };
   }
 
-  protected initConnection() {
-    if (this.port) {
-      this.port.onmessage = message => {
-        this.handleMessage(message.data);
-      };
-      this.port.onmessageerror = error => {
-        this.handleError(error);
-      };
-      this.initiated = true;
-      this.emit('mio-connected');
-      this.completeBacklog();
-    }
+  protected initPortEvents() {
+    this.port.onmessage = message => {
+      this.handleMessage(message.data);
+    };
+    this.port.onmessageerror = error => {
+      this.handleError(error);
+    };
+  }
+
+  protected finishInit() {
+    this.initiated = true;
+    this.emit(MIO_EVENTS.CONNECTED);
+    this.completeBacklog();
   }
 
   protected completeBacklog() {
@@ -176,7 +183,7 @@ export class Connection {
     return typeof num === 'number' && num >= 0;
   }
 
-  private getTimeout(num: any): number {
+  protected getTimeout(num: any): number {
     if (this.isPositiveNumber(num)) {
       return num;
     }
@@ -214,8 +221,16 @@ export class Connection {
     }
   }
 
-  private message(message: Message) {
-    if (!this.initiated) {
+  protected message(message: Message) {
+    let force = false;
+    if (
+      message.event === MIO_EVENTS.HANDSHAKE ||
+      message.event === MIO_EVENTS.CONNECTED ||
+      message.event === MIO_EVENTS.DISCONNECTED
+    ) {
+      force = true;
+    }
+    if (!this.initiated && !force) {
       this.backlog.push(message);
     } else if (this.port) {
       this.portMessage(message);

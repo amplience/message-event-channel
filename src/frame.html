@@ -11,10 +11,10 @@
   <div id="content"></div>
   <script>
     window.connection = mio.connect(null,{debug:false})
-    window.connection.on('request-data-passthrough-fail', (payload, resolve, reject) => {
+    window.connection.on('passthrough-fail', (payload, resolve, reject) => {
       reject(payload);
     })
-    window.connection.on('request-data-passthrough-success', (payload, resolve, reject) => {
+    window.connection.on('passthrough', (payload, resolve, reject) => {
       resolve(payload);
     })
   </script>

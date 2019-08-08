@@ -1,5 +1,5 @@
-import { ServerConnection } from '../src/ServerConnection';
-
+import { ServerConnection } from './ServerConnection';
+import { MIO_EVENTS } from './Connection';
 describe('Server', () => {
   it('attaches an event listener to the frame', () => {
     const frame = document.createElement('iframe');
@@ -16,11 +16,11 @@ describe('Server', () => {
     expect(frameEvent).not.toHaveBeenCalled();
   });
 
-  it('calls init when the frame is loaded and initiation is completed', done => {
+  it('calls onload when the frame is loaded and initiation is completed', done => {
     const frame = document.createElement('iframe');
     frame.src = './base/src/frame.html';
     const server = new ServerConnection(frame);
-    const serverInit = spyOn(server, 'init');
+    const serverInit = spyOn(server, 'startInit');
     frame.onload = () => {
       expect(serverInit).toHaveBeenCalled();
       expect(serverInit).toHaveBeenCalledTimes(1);
@@ -34,7 +34,7 @@ describe('Server', () => {
     const frame = document.createElement('iframe');
     frame.src = './base/src/frame.html';
     const server = new ServerConnection(frame);
-    server.on('mio-connected', () => {
+    server.on(MIO_EVENTS.CONNECTED, () => {
       expect(server.initiated).toBeTruthy();
       document.body.removeChild(frame);
       done();
@@ -55,36 +55,60 @@ describe('Server', () => {
     document.body.appendChild(frame);
   });
 
-  it('should complete init if a non-empty frame is loaded', done => {
+  it('should only be initialised once the handshake is received from the child', done => {
     const frame = document.createElement('iframe');
     frame.src = './base/src/frame.html';
     const server = new ServerConnection(frame);
-    frame.onload = () => {
-      setTimeout(() => {
-        expect(server.initiated).toBeTruthy();
-        document.body.removeChild(frame);
-        done();
-      }, 1);
-    };
+    server.on(MIO_EVENTS.CONNECTED, () => {
+      expect(server.initiated).toBeTruthy();
+      document.body.removeChild(frame);
+      done();
+    });
     document.body.appendChild(frame);
   });
 
-  it('should receive a "mio-connection-reset" event when the iframe reloads', done => {
+  it('should receive a MIO_EVENTS.DISCONNECTED event when the iframe reloads', done => {
     const frame: HTMLIFrameElement = document.createElement('iframe');
     const server = new ServerConnection(frame);
     document.body.appendChild(frame);
     let setOnce = false;
-    frame.onload = () => {
+    server.on(MIO_EVENTS.CONNECTED, () => {
       if (!setOnce) {
-        frame.src = '';
+        frame.src = '/404.html';
         setOnce = true;
       }
-    };
-    server.on('mio-connection-reset', (arg: any) => {
+    });
+    server.on(MIO_EVENTS.DISCONNECTED, (arg: any) => {
       expect(arg).toBeUndefined();
       document.body.removeChild(frame);
       done();
     });
     frame.src = './base/src/frame.html';
+  });
+
+  it('should receive all the messages asked for even if the iframe reloads', done => {
+    const frame: HTMLIFrameElement = document.createElement('iframe');
+    const server = new ServerConnection(frame);
+    let count = 0;
+    frame.src = './base/src/frame.html';
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        if (i === 1) {
+          frame.src = '/404.html';
+        }
+        if (i === 8) {
+          frame.src = './base/src/frame.html';
+        }
+        server.request('passthrough', null, 10000).then(() => {
+          if (i === 9) {
+            expect(count).toEqual(9);
+            document.body.removeChild(frame);
+            done();
+          }
+          count++;
+        });
+      }, i * 10);
+    }
+    document.body.appendChild(frame);
   });
 });
