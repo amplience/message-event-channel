@@ -20,9 +20,7 @@ export class Operator {
   }
 
   public close(connection: Connection) {
-    this.connections = this.connections.filter(
-      (c: Connection) => c !== connection
-    );
+    this.connections = this.connections.filter((c: Connection) => c !== connection);
     connection.close();
   }
 

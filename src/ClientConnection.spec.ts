@@ -51,10 +51,7 @@ describe('Client', () => {
     connection.on(MIO_EVENTS.CONNECTED, () => {
       expect(clientRemove).toHaveBeenCalled();
       expect(clientRemove).toHaveBeenCalledTimes(1);
-      expect(clientRemove).toHaveBeenCalledWith(
-        'message',
-        jasmine.any(Function)
-      );
+      expect(clientRemove).toHaveBeenCalledWith('message', jasmine.any(Function));
       document.body.removeChild(frame);
       done();
     });

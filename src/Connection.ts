@@ -111,9 +111,9 @@ export class Connection {
   protected handleMessage(message: Message) {
     if (this.options.debug) {
       console.log(
-        `handle by ${this.isClient() ? 'client' : 'server'} - [${
-          message.type
-        }] "${message.event}", payload: `,
+        `handle by ${this.isClient() ? 'client' : 'server'} - [${message.type}] "${
+          message.event
+        }", payload: `,
         message.payload
       );
     }
@@ -245,9 +245,9 @@ export class Connection {
   private portMessage(message: Message) {
     if (this.options.debug) {
       console.log(
-        `send from ${this.isClient() ? 'client' : 'server'} - [${
-          message.type
-        }] "${message.event}", payload: `,
+        `send from ${this.isClient() ? 'client' : 'server'} - [${message.type}] "${
+          message.event
+        }", payload: `,
         message.payload
       );
     }

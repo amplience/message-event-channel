@@ -1,9 +1,4 @@
-import {
-  Connection,
-  MESSAGE_TYPE,
-  MIO_EVENTS,
-  EmitMessage
-} from './Connection';
+import { Connection, MESSAGE_TYPE, MIO_EVENTS, EmitMessage } from './Connection';
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
@@ -27,9 +22,7 @@ export class ServerConnection extends Connection {
     if (!this.frame.contentWindow || !this.frame.src) {
       return false;
     }
-    this.frame.contentWindow.postMessage(null, this.options.targetOrigin, [
-      this.channel.port2
-    ]);
+    this.frame.contentWindow.postMessage(null, this.options.targetOrigin, [this.channel.port2]);
   }
 
   private listenForHandshake() {
@@ -58,11 +51,8 @@ export class ServerConnection extends Connection {
     if (!this.frame.contentWindow) {
       return false;
     }
-    this.frame.contentWindow.addEventListener(
-      'beforeunload',
-      (event: BeforeUnloadEvent) => {
-        this.connectionLost();
-      }
-    );
+    this.frame.contentWindow.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+      this.connectionLost();
+    });
   }
 }

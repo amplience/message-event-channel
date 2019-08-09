@@ -93,7 +93,7 @@ describe('Server', () => {
     frame.src = './base/src/frame.html';
     for (let i = 0; i < 10; i++) {
       setTimeout(() => {
-        if (i === 1) {
+        if (i === 2) {
           frame.src = '/404.html';
         }
         if (i === 8) {
