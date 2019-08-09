@@ -13,7 +13,7 @@ module.exports = function(config) {
           'src/**/!(*spec).ts': 'coverage'
       },
       reporters: ["dots", "coverage", "karma-typescript"],
-      browsers: ["Chrome"],
+      browsers: ["ChromeHeadless", "Firefox"],
       coverageReporter: {
         type : 'text',
         dir : 'coverage/'

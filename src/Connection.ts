@@ -207,7 +207,12 @@ export class Connection {
           clearTimeout(ct);
         }
       };
-      this.message({ type: MESSAGE_TYPE.REQUEST, event: event, id: uuid, payload });
+      this.message({
+        type: MESSAGE_TYPE.REQUEST,
+        event: event,
+        id: uuid,
+        payload
+      });
     });
   }
 
