@@ -92,22 +92,20 @@ describe('Server', () => {
     let count = 0;
     frame.src = './base/src/frame.html';
     for (let i = 0; i < 10; i++) {
-      setTimeout(() => {
-        if (i === 2) {
-          frame.src = '/404.html';
+      if (i === 1) {
+        frame.src = '/404.html';
+      }
+      if (i === 8) {
+        frame.src = './base/src/frame.html';
+      }
+      server.request('passthrough', null, 10000).then(() => {
+        if (i === 9) {
+          expect(count).toEqual(9);
+          document.body.removeChild(frame);
+          done();
         }
-        if (i === 8) {
-          frame.src = './base/src/frame.html';
-        }
-        server.request('passthrough', null, 10000).then(() => {
-          if (i === 9) {
-            expect(count).toEqual(9);
-            document.body.removeChild(frame);
-            done();
-          }
-          count++;
-        });
-      }, i * 10);
+        count++;
+      });
     }
     document.body.appendChild(frame);
   });

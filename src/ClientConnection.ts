@@ -17,7 +17,16 @@ export class ClientConnection extends Connection {
   }
 
   protected listenForHandshake() {
-    this.request(MIO_EVENTS.HANDSHAKE).then(() => this.finishInit());
+    this.request(MIO_EVENTS.HANDSHAKE).then(() => {
+      this.addBeforeUnloadEvent();
+      this.finishInit();
+    });
+  }
+
+  protected addBeforeUnloadEvent() {
+    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+      this.emit(MIO_EVENTS.DISCONNECTED);
+    });
   }
 
   protected isClient() {
