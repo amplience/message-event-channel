@@ -23,7 +23,11 @@ export class ServerConnection extends Connection {
     if (!this.frame.contentWindow || !this.frame.src) {
       return false;
     }
-    this.frame.contentWindow.postMessage(null, this.options.targetOrigin, [this.channel.port2]);
+    this.frame.contentWindow.postMessage(
+      null,
+      this.options.targetOrigin ? this.options.targetOrigin : '*',
+      [this.channel.port2]
+    );
   }
 
   private listenForHandshake() {

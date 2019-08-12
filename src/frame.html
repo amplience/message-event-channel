@@ -17,6 +17,16 @@
       window.connection.on('passthrough', (payload, resolve, reject) => {
         resolve(payload);
       });
+      window.connection.on('resolve-after', (timeout, resolve, reject) => {
+        setTimeout(()=>{
+          resolve(timeout);
+        }, timeout)
+      });
+      window.connection.on('reject-after', (timeout, resolve, reject) => {
+        setTimeout(()=>{
+          reject(timeout);
+        }, timeout)
+      });
     </script>
   </body>
 </html>

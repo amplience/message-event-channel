@@ -39,10 +39,10 @@ export interface RejectMessage {
 }
 
 export interface Options {
-  timeout: number;
-  debug: boolean;
-  onload: boolean;
-  targetOrigin: string;
+  timeout?: number;
+  debug?: boolean;
+  onload?: boolean;
+  targetOrigin?: string;
 }
 
 type Message = ResolveMessage | RejectMessage | EmitMessage | RequestMessage;
@@ -61,7 +61,12 @@ export enum MIO_EVENTS {
   CONNECTED = 'mio-connected',
   DISCONNECTED = 'mio-disconnected'
 }
-
+/**
+ * MIO Connection Base Class.
+ *
+ * It is used to provide the shared functionality of the ServerConnection and ClientConnection
+ *
+ */
 export class Connection {
   public initiated: boolean = false;
   protected port!: MessagePort;
@@ -76,7 +81,11 @@ export class Connection {
     targetOrigin: '*'
   };
 
-  constructor(protected options: any = {}) {
+  /**
+   * Creates a Connection instance. It takes an optional configuration object.
+   * @param options Connection configuration options
+   */
+  constructor(protected options: Options = {}) {
     this.options = { ...this.defaultOptions, ...options };
   }
 
