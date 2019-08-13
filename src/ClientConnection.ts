@@ -1,4 +1,7 @@
-import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
+import { Connection, MIO_EVENTS } from './Connection';
+/**
+ * The child side of a connection.
+ */
 export class ClientConnection extends Connection {
   private messageListener: any;
   constructor(options: any = {}) {

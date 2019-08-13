@@ -10,7 +10,7 @@ export class Operator {
   /**
    * Connect method will create and return a [[Connection]] instance.
    * The connection will be placed under the management of the Operator until [[close]] is called.
-   * @param frame  Optional param for specifying an iframe for a [[ServerConnection]], if not provided it will create a [[ClientConnection]]
+   * @param frame  Used for specifying an iframe for a [[ServerConnection]], if not provided it will create a [[ClientConnection]]
    * @param options  Optional param for overriding the default options of type [[Options]]
    * @returns Either a [[ServerConnection]] or [[ClientConnection]]
    */
@@ -40,7 +40,7 @@ export class Operator {
   /**
    * This method will emit an event on all the managed connections.
    * @param event The name of the event to emit.
-   * @param payload Optional payload to be sent with the event.
+   * @param payload Payload to be sent with the event.
    * @return Returns Operator instance.
    */
   public emit(event: string, payload?: any): Operator {
@@ -54,9 +54,9 @@ export class Operator {
    * This method will make a request on all the managed connections.
    * It returns a promise and will resolve or reject on the first connection to make a response.
    * @param event The name of the event to emit.
-   * @param payload Optional payload to be sent with the event.
-   * @param timeout Optional timeout value to override connection option, promise will reject after this time elapses
-   * @return Returns a promise which can contain any payload
+   * @param payload Payload to be sent with the event.
+   * @param timeout Value to override connection option, promise will reject after this time elapses
+   * @return A promise which can contain any payload
    */
   public requestRace(event: string, payload?: any, timeout?: number): Promise<any> {
     return Promise.race(this.request(event, payload, timeout));
@@ -64,11 +64,11 @@ export class Operator {
 
   /**
    * This method will make a request on all the managed connections.
-   * It returns a promise and will resolve or reject after all the connections's promises have completed.
+   * It returns a promise and will resolve or reject after all the connections's promises have successfully fulfilled or after a single error is thrown.
    * @param event The name of the event to emit.
-   * @param payload Optional payload to be sent with the event.
-   * @param timeout Optional timeout value to override connection option, promise will reject after this time elapses
-   * @return Returns a promise which can contain any payload
+   * @param payload Payload to be sent with the event.
+   * @param timeout Value to override connection option, promise will reject after this time elapses
+   * @return A promise which can contain any payload
    */
   public requestAll(event: string, payload?: any, timeout?: number): Promise<any> {
     return Promise.all(this.request(event, payload, timeout));
@@ -78,9 +78,9 @@ export class Operator {
    * This method will make a request on all the managed connections.
    * It returns an array containing all the promises it is then up to you manage their completion.
    * @param event The name of the event to emit.
-   * @param payload Optional payload to be sent with the event.
-   * @param timeout Optional timeout value to override connection option, promise will reject after this time elapses
-   * @return Returns an array of promises which can contain any payload
+   * @param payload Payload to be sent with the event.
+   * @param timeout Value to override connection option, promise will reject after this time elapses
+   * @return An array of promises which can contain any payload
    */
   public request(event: string, payload?: any, timeout?: number): Array<Promise<any>> {
     const promiseArray: Array<Promise<any>> = [];

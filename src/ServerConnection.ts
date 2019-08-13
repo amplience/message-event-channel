@@ -1,6 +1,19 @@
-import { Connection, MESSAGE_TYPE, MIO_EVENTS, EmitMessage } from './Connection';
+import { Connection, MIO_EVENTS } from './Connection';
+/**
+ * The parent side of the connection.
+ */
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
+
+  /**
+   *
+   * @param frame The iframe target to setup the connection on.
+   * @param options Connection configuration options.
+   * @param options.timeout Default connection timeout (ms). This will trigger a reject on a any request that takes longer than this value. 200ms by default.
+   * @param options.debug Enabling uses console.log to output what MIO is doing behind the scenes. Used for debugging. Disabled by default.
+   * @param options.onload Uses the onload event of an iframe to trigger the process for creating a connection. If set to false the connection process needs to be triggered manually. Note a connection will only work if the child frame has loaded. Enabled by default.
+   * @param options.targetOrigin Limits the iframe to send messages to only the specified origins. '*' by Default.
+   */
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
     super(options);
     if (this.options.onload) {
@@ -9,6 +22,9 @@ export class ServerConnection extends Connection {
     this.on(MIO_EVENTS.DISCONNECTED, () => (this.initiated = false));
   }
 
+  /**
+   * Used to trigger the initiation of a connection manually. To be used if the onload option is disabled.
+   */
   public startInit() {
     if (!this.frame.contentWindow || !this.frame.src) {
       return false;
@@ -37,7 +53,7 @@ export class ServerConnection extends Connection {
     });
   }
 
-  public setupChannel() {
+  private setupChannel() {
     this.channel = new MessageChannel();
     this.port = this.channel.port1;
   }
