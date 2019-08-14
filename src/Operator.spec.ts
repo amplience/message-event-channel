@@ -75,7 +75,7 @@ describe('Operator', () => {
     expect(promise instanceof Promise).toBeTruthy();
   });
 
-  it('calls request on all connections when using requestRace', () => {
+  it('calls request on all connections when using Operator.requestRace()', () => {
     const frame = createIframe();
     const op = new Operator();
     const connection1 = op.connect(frame);
@@ -88,7 +88,7 @@ describe('Operator', () => {
     expect(promise instanceof Promise).toBeTruthy();
   });
 
-  it('resolves with all data when using requestAll', done => {
+  it('resolves with all data when using Operator.requestAll()', done => {
     const frame = createIframe('./base/src/frame.html');
     const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
@@ -111,7 +111,7 @@ describe('Operator', () => {
     appendIframe(frame2);
   });
 
-  it('rejects on the first promise rejection when using requestAll', done => {
+  it('rejects on the first promise rejection when using Operator.requestAll()', done => {
     const frame = createIframe('./base/src/frame.html');
     const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
@@ -132,7 +132,7 @@ describe('Operator', () => {
     appendIframe(frame2);
   });
 
-  it('resolves on the first promise when using requestRace', done => {
+  it('resolves on the first promise when using Operator.requestRace()', done => {
     const frame = createIframe('./base/src/frame.html');
     const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
@@ -151,7 +151,7 @@ describe('Operator', () => {
     appendIframe(frame2);
   });
 
-  it('rejects on the first promise rejection when using requestRace', done => {
+  it('rejects on the first promise rejection when using Operator.requestRace()', done => {
     const frame = createIframe('./base/src/frame.html');
     const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
@@ -172,7 +172,7 @@ describe('Operator', () => {
     appendIframe(frame2);
   });
 
-  it('returns a promise array when using resolve', done => {
+  it('returns a promise array when using Operator.resolve()', done => {
     const frame = createIframe('./base/src/frame.html');
     const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
