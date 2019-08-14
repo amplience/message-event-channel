@@ -1,6 +1,7 @@
 import { Operator } from '../src/Operator';
 import { ClientConnection } from '../src/ClientConnection';
 import { ServerConnection } from '../src/ServerConnection';
+import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 
 describe('Operator', () => {
   it('creates a client connection without an iframe', () => {
@@ -9,13 +10,13 @@ describe('Operator', () => {
     expect(connection instanceof ClientConnection).toBeTruthy();
   });
   it('creates a server connection with an iframe', () => {
-    const frame = document.createElement('iframe');
+    const frame = createIframe();
     const op = new Operator();
     const connection = op.connect(frame);
     expect(connection instanceof ServerConnection).toBeTruthy();
   });
   it('closes a connection', () => {
-    const frame = document.createElement('iframe');
+    const frame = createIframe('./base/src/frame.html');
     const op = new Operator();
     const connection = op.connect(frame);
     const spyClose = spyOn(connection, 'close');
@@ -24,7 +25,7 @@ describe('Operator', () => {
   });
 
   it('emits to all connections', () => {
-    const frame = document.createElement('iframe');
+    const frame = createIframe();
     const op = new Operator();
     const connection1 = op.connect(frame);
     const connection2 = op.connect(frame);
@@ -36,7 +37,7 @@ describe('Operator', () => {
   });
 
   it("doesn't emit to closed connections", () => {
-    const frame = document.createElement('iframe');
+    const frame = createIframe();
     const op = new Operator();
     const connection1 = op.connect(frame);
     const connection2 = op.connect(frame);
@@ -49,7 +50,7 @@ describe('Operator', () => {
   });
 
   it('calls request on all connections when using request', () => {
-    const frame = document.createElement('iframe');
+    const frame = createIframe();
     const op = new Operator();
     const connection1 = op.connect(frame);
     const connection2 = op.connect(frame);
@@ -62,7 +63,7 @@ describe('Operator', () => {
   });
 
   it('calls request on all connections when using requestAll', () => {
-    const frame = document.createElement('iframe');
+    const frame = createIframe();
     const op = new Operator();
     const connection1 = op.connect(frame);
     const connection2 = op.connect(frame);
@@ -75,7 +76,7 @@ describe('Operator', () => {
   });
 
   it('calls request on all connections when using requestRace', () => {
-    const frame = document.createElement('iframe');
+    const frame = createIframe();
     const op = new Operator();
     const connection1 = op.connect(frame);
     const connection2 = op.connect(frame);
@@ -88,10 +89,8 @@ describe('Operator', () => {
   });
 
   it('resolves with all data when using requestAll', done => {
-    const frame = document.createElement('iframe');
-    const frame2 = document.createElement('iframe');
-    frame.src = './base/src/frame.html';
-    frame2.src = './base/src/frame.html';
+    const frame = createIframe('./base/src/frame.html');
+    const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -103,20 +102,18 @@ describe('Operator', () => {
         expect(data.length).toEqual(2);
         expect(data[0]).toEqual(timeoutPayload);
         expect(data[1]).toEqual(timeoutPayload);
-        document.body.removeChild(frame);
-        document.body.removeChild(frame2);
+        removeIframe(frame);
+        removeIframe(frame2);
         done();
       })
       .catch(error => {});
-    document.body.appendChild(frame);
-    document.body.appendChild(frame2);
+    appendIframe(frame);
+    appendIframe(frame2);
   });
 
   it('rejects on the first promise rejection when using requestAll', done => {
-    const frame = document.createElement('iframe');
-    const frame2 = document.createElement('iframe');
-    frame.src = './base/src/frame.html';
-    frame2.src = './base/src/frame.html';
+    const frame = createIframe('./base/src/frame.html');
+    const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -127,19 +124,17 @@ describe('Operator', () => {
       .catch(data => {
         expect(data instanceof Array).toBeFalsy();
         expect(data).toEqual(timeoutPayload);
-        document.body.removeChild(frame);
-        document.body.removeChild(frame2);
+        removeIframe(frame);
+        removeIframe(frame2);
         done();
       });
-    document.body.appendChild(frame);
-    document.body.appendChild(frame2);
+    appendIframe(frame);
+    appendIframe(frame2);
   });
 
   it('resolves on the first promise when using requestRace', done => {
-    const frame = document.createElement('iframe');
-    const frame2 = document.createElement('iframe');
-    frame.src = './base/src/frame.html';
-    frame2.src = './base/src/frame.html';
+    const frame = createIframe('./base/src/frame.html');
+    const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -148,19 +143,17 @@ describe('Operator', () => {
     promise.then(data => {
       expect(data instanceof Array).toBeFalsy();
       expect(data).toEqual(timeoutPayload);
-      document.body.removeChild(frame);
-      document.body.removeChild(frame2);
+      removeIframe(frame);
+      removeIframe(frame2);
       done();
     });
-    document.body.appendChild(frame);
-    document.body.appendChild(frame2);
+    appendIframe(frame);
+    appendIframe(frame2);
   });
 
   it('rejects on the first promise rejection when using requestRace', done => {
-    const frame = document.createElement('iframe');
-    const frame2 = document.createElement('iframe');
-    frame.src = './base/src/frame.html';
-    frame2.src = './base/src/frame.html';
+    const frame = createIframe('./base/src/frame.html');
+    const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -171,19 +164,17 @@ describe('Operator', () => {
       .catch(data => {
         expect(data instanceof Array).toBeFalsy();
         expect(data).toEqual(timeoutPayload);
-        document.body.removeChild(frame);
-        document.body.removeChild(frame2);
+        removeIframe(frame);
+        removeIframe(frame2);
         done();
       });
-    document.body.appendChild(frame);
-    document.body.appendChild(frame2);
+    appendIframe(frame);
+    appendIframe(frame2);
   });
 
   it('returns a promise array when using resolve', done => {
-    const frame = document.createElement('iframe');
-    const frame2 = document.createElement('iframe');
-    frame.src = './base/src/frame.html';
-    frame2.src = './base/src/frame.html';
+    const frame = createIframe('./base/src/frame.html');
+    const frame2 = createIframe('./base/src/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -197,11 +188,11 @@ describe('Operator', () => {
       expect(data.length).toEqual(2);
       expect(data[0]).toEqual(timeoutPayload);
       expect(data[1]).toEqual(timeoutPayload);
-      document.body.removeChild(frame);
-      document.body.removeChild(frame2);
+      removeIframe(frame);
+      removeIframe(frame2);
       done();
     });
-    document.body.appendChild(frame);
-    document.body.appendChild(frame2);
+    appendIframe(frame);
+    appendIframe(frame2);
   });
 });

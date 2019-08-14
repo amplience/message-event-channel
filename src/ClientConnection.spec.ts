@@ -1,7 +1,7 @@
 import { ClientConnection } from '../src/ClientConnection';
 import { ServerConnection } from '../src/ServerConnection';
 import { MIO_EVENTS } from '../src/Connection';
-beforeAll(() => {});
+import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 
 declare global {
   interface Window {
@@ -19,9 +19,8 @@ describe('Client', () => {
   });
 
   it('client should receive a message event with a port', done => {
-    const frame: HTMLIFrameElement = document.createElement('iframe');
+    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     new ServerConnection(frame);
-    document.body.appendChild(frame);
     frame.onload = () => {
       if (!frame.contentWindow) {
         return;
@@ -29,17 +28,16 @@ describe('Client', () => {
       frame.contentWindow.addEventListener('message', event => {
         expect(event.constructor.name).toEqual('MessageEvent');
         expect(event.ports[0].constructor.name).toEqual('MessagePort');
-        document.body.removeChild(frame);
+        removeIframe(frame);
         done();
       });
     };
-    frame.src = './base/src/frame.html';
+    appendIframe(frame);
   });
 
   it('should initiate when it has received a message event and remove listener', done => {
-    const frame: HTMLIFrameElement = document.createElement('iframe');
+    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const connection = new ServerConnection(frame);
-    document.body.appendChild(frame);
     let clientRemove: Function;
     frame.onload = () => {
       if (!frame.contentWindow) {
@@ -52,16 +50,15 @@ describe('Client', () => {
       expect(clientRemove).toHaveBeenCalled();
       expect(clientRemove).toHaveBeenCalledTimes(1);
       expect(clientRemove).toHaveBeenCalledWith('message', jasmine.any(Function));
-      document.body.removeChild(frame);
+      removeIframe(frame);
       done();
     });
-    frame.src = './base/src/frame.html';
+    appendIframe(frame);
   });
 
   it('should receive a message from the parent', done => {
-    const frame: HTMLIFrameElement = document.createElement('iframe');
+    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const connection = new ServerConnection(frame);
-    document.body.appendChild(frame);
     frame.addEventListener('load', () => {
       if (!frame.contentWindow || !frame.src) {
         return;
@@ -69,19 +66,18 @@ describe('Client', () => {
       const window: Window = frame.contentWindow;
       window.connection.on('event', (arg: any) => {
         expect(arg).toBeUndefined();
-        document.body.removeChild(frame);
+        removeIframe(frame);
         done();
       });
     });
     connection.emit('event');
-    frame.src = './base/src/frame.html';
+    appendIframe(frame);
   });
 
   it('should receive a message from the parent with data', done => {
-    const frame: HTMLIFrameElement = document.createElement('iframe');
+    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const connection = new ServerConnection(frame);
     const payload = { hello: 'there' };
-    document.body.appendChild(frame);
     frame.addEventListener('load', () => {
       if (!frame.contentWindow || !frame.src) {
         return;
@@ -89,11 +85,11 @@ describe('Client', () => {
       const window: Window = frame.contentWindow;
       window.connection.on('event', (rcv: any) => {
         expect(rcv).toEqual(payload);
-        document.body.removeChild(frame);
+        removeIframe(frame);
         done();
       });
     });
     connection.emit('event', payload);
-    frame.src = './base/src/frame.html';
+    appendIframe(frame);
   });
 });
