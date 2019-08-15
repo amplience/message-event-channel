@@ -1,4 +1,4 @@
-import mio from './mio';
+import mio from './message.io';
 import { Operator } from './Operator';
 import { Connection, MIO_EVENTS } from './Connection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';

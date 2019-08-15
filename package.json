@@ -1,11 +1,12 @@
 {
-  "name": "message-io",
+  "name": "message.io",
+  "umd": "mio",
   "version": "0.0.0",
   "description": "",
   "keywords": [],
   "main": "dist/message-io.umd.js",
-  "module": "dist/message-io.es5.js",
-  "typings": "dist/types/message-io.d.ts",
+  "module": "dist/message-io.esm.js",
+  "typings": "dist/types/message.io.all-exports.d.ts",
   "files": [
     "dist"
   ],
@@ -21,7 +22,7 @@
   "scripts": {
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "build": "tsc --module commonjs && rollup -c rollup.config.ts && rollup -c rollup.config.all-exports.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
     "start": "rollup -c rollup.config.ts -w",
     "test": "npm run build && karma start",
     "deploy-docs": "ts-node tools/gh-pages-publish",
