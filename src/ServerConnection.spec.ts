@@ -55,6 +55,16 @@ describe('Server', () => {
     appendIframe(frame);
   });
 
+  it('should fire a connection timed out event if no client connects', done => {
+    const frame: HTMLIFrameElement = createIframe();
+    const server = new ServerConnection(frame);
+    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, () => {
+      removeIframe(frame);
+      done();
+    });
+    appendIframe(frame);
+  });
+
   it('should only be initialised once the handshake is received from the child', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);

@@ -18,7 +18,7 @@ describe('Client', () => {
     expect(windowEvent).toHaveBeenCalledWith('message', jasmine.any(Function));
   });
 
-  it('client should receive a message event with a port', done => {
+  it('should receive a message event with a port', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     new ServerConnection(frame);
     frame.onload = () => {
@@ -29,6 +29,20 @@ describe('Client', () => {
         expect(event.constructor.name).toEqual('MessageEvent');
         expect(event.ports[0].constructor.name).toEqual('MessagePort');
         removeIframe(frame);
+        done();
+      });
+    };
+    appendIframe(frame);
+  });
+
+  it('should fire a connection timeout event', done => {
+    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    frame.onload = () => {
+      if (!frame.contentWindow) {
+        return;
+      }
+      const window: Window = frame.contentWindow;
+      window.connection.on(MIO_EVENTS.CONNECTION_TIMEOUT, () => {
         done();
       });
     };
