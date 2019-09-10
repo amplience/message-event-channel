@@ -33,7 +33,7 @@ export class ServerConnection extends Connection {
     this.initPortEvents();
     this.listenForHandshake();
     this.sendPortToClient();
-    this.connectionTimeout = setTimeout(() => {
+    this.connectionTimeout = window.setTimeout(() => {
       this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
     }, this.options.connectionTimeout);
   }

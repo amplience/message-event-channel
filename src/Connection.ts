@@ -155,7 +155,7 @@ export class Connection {
   public request(event: string, payload?: any, timeout?: number): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       const uuid: string = event + '_' + Object.keys(this.promises).length;
-      const ct = setTimeout(() => reject('timeout'), this.getTimeout(timeout));
+      const ct = window.setTimeout(() => reject('timeout'), this.getTimeout(timeout));
       this.promises[uuid] = {
         resolve: (resolvedData: any) => {
           resolve(resolvedData);
