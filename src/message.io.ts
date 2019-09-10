@@ -1,5 +1,4 @@
-import { Operator } from './Operator';
-/**
- * An instance of [Operator]
- */
-export default new Operator();
+export * from './Operator';
+export * from './Connection';
+export * from './ClientConnection';
+export * from './ServerConnection';

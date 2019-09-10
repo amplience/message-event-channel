@@ -40,11 +40,22 @@ export interface RejectMessage {
 /**
  * Options for the connection.
  */
-export interface Options {
+export interface OptionsObject {
+  window?: Window;
   timeout?: number;
+  connectionTimeout?: number;
   debug?: boolean;
   onload?: boolean;
   targetOrigin?: string;
+}
+
+export interface Options {
+  window: Window;
+  timeout: number;
+  connectionTimeout: number;
+  debug: boolean;
+  onload: boolean;
+  targetOrigin: string;
 }
 
 type Message = ResolveMessage | RejectMessage | EmitMessage | RequestMessage;
@@ -66,7 +77,8 @@ export enum MESSAGE_TYPE {
 export enum MIO_EVENTS {
   HANDSHAKE = 'mio-handshake',
   CONNECTED = 'mio-connected',
-  DISCONNECTED = 'mio-disconnected'
+  DISCONNECTED = 'mio-disconnected',
+  CONNECTION_TIMEOUT = 'mio-connection-timeout'
 }
 /**
  * Connection Base Class.
@@ -84,7 +96,11 @@ export class Connection {
   protected promises: Promises = {};
   private emitters: Emits = {};
   private readonly timeout: number = 100;
+  protected options: Options;
+  protected connectionTimeout!: number;
   protected readonly defaultOptions: Options = {
+    window: window,
+    connectionTimeout: 200,
     timeout: 2000,
     debug: false,
     onload: true,
@@ -99,7 +115,7 @@ export class Connection {
    * @param options.onload Uses the onload event of an iframe to trigger the process for creating a connection. If set to false the connection process needs to be triggered manually. Note a connection will only work if the child frame has loaded. Enabled by default.
    * @param options.targetOrigin Limits the iframe to send messages to only the specified origins. '*' by Default.
    */
-  constructor(protected options: Options = {}) {
+  constructor(options: OptionsObject = {}) {
     this.options = { ...this.defaultOptions, ...options };
   }
 
@@ -180,6 +196,7 @@ export class Connection {
 
   protected finishInit() {
     this.initiated = true;
+    clearTimeout(this.connectionTimeout);
     this.emit(MIO_EVENTS.CONNECTED);
     this.completeBacklog();
   }

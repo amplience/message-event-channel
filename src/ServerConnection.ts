@@ -1,4 +1,4 @@
-import { Connection, MIO_EVENTS } from './Connection';
+import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
 /**
  * The parent side of the connection.
  */
@@ -33,6 +33,9 @@ export class ServerConnection extends Connection {
     this.initPortEvents();
     this.listenForHandshake();
     this.sendPortToClient();
+    this.connectionTimeout = setTimeout(() => {
+      this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
+    }, this.options.connectionTimeout);
   }
 
   private sendPortToClient() {

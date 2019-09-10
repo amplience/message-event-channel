@@ -1,6 +1,6 @@
 import { ServerConnection } from './ServerConnection';
 import { ClientConnection } from './ClientConnection';
-import { Options, Connection } from './Connection';
+import { OptionsObject, Connection } from './Connection';
 
 export class Operator {
   private connections: Array<Connection> = [];
@@ -14,7 +14,7 @@ export class Operator {
    * @param options  Optional param for overriding the default options of type [[Options]]
    * @returns Either a [[ServerConnection]] or [[ClientConnection]]
    */
-  public connect(frame?: HTMLIFrameElement, options: Options = {}): Connection {
+  public connect(frame?: HTMLIFrameElement, options: OptionsObject = {}): Connection {
     let connection: Connection;
     if (frame) {
       connection = new ServerConnection(frame, options);

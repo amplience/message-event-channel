@@ -10,7 +10,8 @@
   <body>
     <div id="content"></div>
     <script>
-      window.connection = mio.connect(null, { debug: false });
+      const o = new mio.Operator();
+      window.connection = o.connect(null, { debug: false });
       window.connection.on('passthrough-fail', (payload, resolve, reject) => {
         reject(payload);
       });

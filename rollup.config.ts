@@ -10,6 +10,7 @@ export default {
   input: `src/${pkg.name}.ts`,
   output: [
     { file: pkg.main, name: pkg.umd, format: 'umd', sourcemap: true },
+    { file: pkg.module, format: 'es', sourcemap: true }
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: [],

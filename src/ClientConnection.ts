@@ -1,4 +1,4 @@
-import { Connection, MIO_EVENTS } from './Connection';
+import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
 /**
  * The child side of a connection.
  */
@@ -7,7 +7,10 @@ export class ClientConnection extends Connection {
   constructor(options: any = {}) {
     super(options);
     this.messageListener = (e: MessageEvent) => this.startInit(e);
-    window.addEventListener('message', this.messageListener);
+    this.options.window.addEventListener('message', this.messageListener);
+    this.connectionTimeout = setTimeout(() => {
+      this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
+    }, this.options.connectionTimeout);
   }
 
   private startInit(e: MessageEvent) {
@@ -15,7 +18,7 @@ export class ClientConnection extends Connection {
       this.port = e.ports[0];
       this.initPortEvents();
       this.listenForHandshake();
-      window.removeEventListener('message', this.messageListener);
+      this.options.window.removeEventListener('message', this.messageListener);
     }
   }
 
@@ -27,7 +30,7 @@ export class ClientConnection extends Connection {
   }
 
   protected addBeforeUnloadEvent() {
-    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+    this.options.window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
       this.emit(MIO_EVENTS.DISCONNECTED);
     });
   }
