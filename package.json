@@ -7,9 +7,6 @@
   "main": "dist/message-io.umd.js",
   "module": "dist/message-io.esm.js",
   "typings": "dist/types/message.io.d.ts",
-  "files": [
-    "dist"
-  ],
   "author": "ccorbett <ccorbett@amplience.com>",
   "repository": {
     "type": "git",
