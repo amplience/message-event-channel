@@ -14,7 +14,12 @@ export class ClientConnection extends Connection {
   }
 
   public init() {
-    this.options.window.parent.postMessage(this.options.window.name, this.options.targetOrigin);
+    const url = new URL(this.options.window.location.toString());
+    const name = url.searchParams.get('mio-name');
+    if (this.options.debug) {
+      console.log('Client: sent postMessage value:', name);
+    }
+    this.options.window.parent.postMessage(name, this.options.targetOrigin);
   }
 
   private messageHandler(e: MessageEvent) {

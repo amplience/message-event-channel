@@ -1,6 +1,6 @@
 import { ServerConnection } from './ServerConnection';
 import { ClientConnection } from './ClientConnection';
-import { OptionsObject, Connection } from './Connection';
+import { ConnectionOptions, Connection, RequestOptions } from './Connection';
 
 export class Operator {
   private connections: Array<Connection> = [];
@@ -14,7 +14,7 @@ export class Operator {
    * @param options  Optional param for overriding the default options of type [[Options]]
    * @returns Either a [[ServerConnection]] or [[ClientConnection]]
    */
-  public connect(frame?: HTMLIFrameElement, options: OptionsObject = {}): Connection {
+  public connect(frame?: HTMLIFrameElement, options: ConnectionOptions = {}): Connection {
     let connection: Connection;
     if (frame) {
       connection = new ServerConnection(frame, options);
@@ -58,8 +58,8 @@ export class Operator {
    * @param timeout Value to override connection option, promise will reject after this time elapses
    * @return A promise which can contain any payload
    */
-  public requestRace(event: string, payload?: any, timeout?: number): Promise<any> {
-    return Promise.race(this.request(event, payload, timeout));
+  public requestRace<T = any>(event: string, payload?: any, options?: RequestOptions): Promise<T> {
+    return Promise.race(this.request(event, payload, options));
   }
 
   /**
@@ -70,8 +70,12 @@ export class Operator {
    * @param timeout Value to override connection option, promise will reject after this time elapses
    * @return A promise which can contain any payload
    */
-  public requestAll(event: string, payload?: any, timeout?: number): Promise<any> {
-    return Promise.all(this.request(event, payload, timeout));
+  public requestAll<T = any>(
+    event: string,
+    payload?: any,
+    options?: RequestOptions
+  ): Promise<Array<T>> {
+    return Promise.all(this.request(event, payload, options));
   }
 
   /**
@@ -82,10 +86,14 @@ export class Operator {
    * @param timeout Value to override connection option, promise will reject after this time elapses
    * @return An array of promises which can contain any payload
    */
-  public request(event: string, payload?: any, timeout?: number): Array<Promise<any>> {
-    const promiseArray: Array<Promise<any>> = [];
+  public request<T = any>(
+    event: string,
+    payload?: any,
+    options?: RequestOptions
+  ): Array<Promise<T>> {
+    const promiseArray: Array<Promise<T>> = [];
     this.connections.forEach((connection: Connection) => {
-      promiseArray.push(connection.request(event, payload, timeout));
+      promiseArray.push(connection.request(event, payload, options));
     });
     return promiseArray;
   }

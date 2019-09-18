@@ -4,6 +4,7 @@ import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
  */
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
+  private name!: string;
   /**
    *
    * @param frame The iframe target to setup the connection on.
@@ -15,24 +16,35 @@ export class ServerConnection extends Connection {
    */
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
     super(options);
-    frame.classList.add('mio-iframe');
+    this.frame.classList.add('mio-iframe');
     if (this.options.onload) {
-      frame.addEventListener('load', () => this.init());
+      this.frame.addEventListener('load', () => this.init());
     }
     if (this.options.clientInitiates) {
-      const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
-      frame.name = 'mio_' + numFrames;
-      this.options.window.addEventListener('message', (e: MessageEvent) =>
-        this.clientInitiation(e)
-      );
+      this.setupClientInit();
+    }
+    if (this.options.url) {
+      this.frame.src = this.options.url;
     }
     this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
   }
 
   private clientInitiation(e: MessageEvent) {
-    if (e.data === this.frame.name) {
+    if (e.data === this.name) {
+      if (this.options.debug) {
+        console.log('Server: Client triggered initiation');
+      }
       this.init();
     }
+  }
+
+  private setupClientInit() {
+    const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
+    this.name = 'mio-' + numFrames;
+    const url = new URL(this.options.url ? this.options.url : this.frame.src);
+    url.searchParams.append('mio-name', this.name);
+    this.options.url = url.toString();
+    this.options.window.addEventListener('message', (e: MessageEvent) => this.clientInitiation(e));
   }
 
   /**
