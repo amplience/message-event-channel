@@ -55,6 +55,7 @@ export interface Options {
   connectionTimeout: number;
   debug: boolean;
   onload: boolean;
+  clientInitiates: boolean;
   targetOrigin: string;
 }
 
@@ -90,7 +91,7 @@ export class Connection {
   /**
    * Indicates if a connection has been established
    */
-  public initiated: boolean = false;
+  public connected: boolean = false;
   protected port!: MessagePort;
   private backlog: Array<Message> = [];
   protected promises: Promises = {};
@@ -104,6 +105,7 @@ export class Connection {
     timeout: 2000,
     debug: false,
     onload: true,
+    clientInitiates: false,
     targetOrigin: '*'
   };
 
@@ -179,9 +181,9 @@ export class Connection {
    * Close the port being used to communicate. It will prevent any further messages being sent or received.
    */
   public close() {
-    if (this.initiated) {
+    if (this.connected) {
       this.port.close();
-      this.initiated = false;
+      this.connected = false;
     }
   }
 
@@ -195,7 +197,7 @@ export class Connection {
   }
 
   protected finishInit() {
-    this.initiated = true;
+    this.connected = true;
     clearTimeout(this.connectionTimeout);
     this.emit(MIO_EVENTS.CONNECTED);
     this.completeBacklog();
@@ -298,7 +300,7 @@ export class Connection {
     ) {
       force = true;
     }
-    if (!this.initiated && !force) {
+    if (!this.connected && !force) {
       this.backlog.push(message);
     } else if (this.port) {
       this.portMessage(message);

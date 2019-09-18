@@ -6,14 +6,18 @@ export class ClientConnection extends Connection {
   private messageListener: any;
   constructor(options: any = {}) {
     super(options);
-    this.messageListener = (e: MessageEvent) => this.startInit(e);
+    this.messageListener = (e: MessageEvent) => this.messageHandler(e);
     this.options.window.addEventListener('message', this.messageListener);
     this.connectionTimeout = window.setTimeout(() => {
       this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
     }, this.options.connectionTimeout);
   }
 
-  private startInit(e: MessageEvent) {
+  public startInit() {
+    this.options.window.parent.postMessage(this.options.window.name, this.options.targetOrigin);
+  }
+
+  private messageHandler(e: MessageEvent) {
     if (e.ports[0]) {
       this.port = e.ports[0];
       this.initPortEvents();

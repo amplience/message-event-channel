@@ -31,11 +31,32 @@ describe('Server', () => {
     appendIframe(frame);
   });
 
-  it('is set to initiated if connection event is sent', done => {
+  it('only initiates when a postmessage message is received, and clientInitiates = true', done => {
+    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const server = new ServerConnection(frame, {
+      onload: false,
+      clientInitiates: true
+    });
+    const serverInit = spyOn(server, 'startInit');
+    frame.onload = () => {
+      if (frame.contentWindow) {
+        expect(serverInit).not.toHaveBeenCalled();
+        frame.contentWindow.connection.startInit();
+      }
+    };
+    window.addEventListener('message', (e: MessageEvent) => {
+      expect(serverInit).toHaveBeenCalled();
+      removeIframe(frame);
+      done();
+    });
+    appendIframe(frame);
+  });
+
+  it('is set to connected if connection event is sent', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
     server.on(MIO_EVENTS.CONNECTED, () => {
-      expect(server.initiated).toBeTruthy();
+      expect(server.connected).toBeTruthy();
       removeIframe(frame);
       done();
     });
@@ -47,7 +68,7 @@ describe('Server', () => {
     const server = new ServerConnection(frame);
     frame.onload = () => {
       setTimeout(() => {
-        expect(server.initiated).toBeFalsy();
+        expect(server.connected).toBeFalsy();
         removeIframe(frame);
         done();
       }, 1);
@@ -69,7 +90,7 @@ describe('Server', () => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
     server.on(MIO_EVENTS.CONNECTED, () => {
-      expect(server.initiated).toBeTruthy();
+      expect(server.connected).toBeTruthy();
       removeIframe(frame);
       done();
     });
