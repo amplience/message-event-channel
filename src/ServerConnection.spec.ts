@@ -21,7 +21,7 @@ describe('Server', () => {
   it('calls onload when the frame is loaded and initiation is completed', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
-    const serverInit = spyOn(server, 'startInit');
+    const serverInit = spyOn(server, 'init');
     frame.onload = () => {
       expect(serverInit).toHaveBeenCalled();
       expect(serverInit).toHaveBeenCalledTimes(1);
@@ -37,11 +37,11 @@ describe('Server', () => {
       onload: false,
       clientInitiates: true
     });
-    const serverInit = spyOn(server, 'startInit');
+    const serverInit = spyOn(server, 'init');
     frame.onload = () => {
       if (frame.contentWindow) {
         expect(serverInit).not.toHaveBeenCalled();
-        frame.contentWindow.connection.startInit();
+        frame.contentWindow.connection.init();
       }
     };
     window.addEventListener('message', (e: MessageEvent) => {

@@ -17,7 +17,7 @@ export class ServerConnection extends Connection {
     super(options);
     frame.classList.add('mio-iframe');
     if (this.options.onload) {
-      frame.addEventListener('load', () => this.startInit());
+      frame.addEventListener('load', () => this.init());
     }
     if (this.options.clientInitiates) {
       const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
@@ -31,14 +31,14 @@ export class ServerConnection extends Connection {
 
   private clientInitiation(e: MessageEvent) {
     if (e.data === this.frame.name) {
-      this.startInit();
+      this.init();
     }
   }
 
   /**
-   * Used to trigger the initiation of a connection manually. To be used if the onload option is disabled.
+   * Used to trigger the initiation of a connection manually. To be used if the onload, and clientInitiates options are disabled.
    */
-  public startInit() {
+  public init() {
     if (!this.frame.contentWindow || !this.frame.src || this.connected) {
       return false;
     }

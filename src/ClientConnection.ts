@@ -13,7 +13,7 @@ export class ClientConnection extends Connection {
     }, this.options.connectionTimeout);
   }
 
-  public startInit() {
+  public init() {
     this.options.window.parent.postMessage(this.options.window.name, this.options.targetOrigin);
   }
 
