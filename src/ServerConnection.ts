@@ -18,13 +18,15 @@ export class ServerConnection extends Connection {
     super(options);
     this.frame.classList.add('mio-iframe');
     if (this.options.onload) {
-      this.frame.addEventListener('load', () => this.init());
-    }
-    if (this.options.clientInitiates) {
-      this.setupClientInit();
-    }
-    if (this.options.url) {
-      this.frame.src = this.options.url;
+      this.frame.addEventListener('load', () => {
+        if (this.options.clientInitiates) {
+          this.setupClientInit();
+        }
+        if (this.options.url && this.frame.contentWindow) {
+          this.frame.contentWindow.location.replace(this.options.url);
+        }
+        this.init();
+      });
     }
     this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
   }

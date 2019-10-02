@@ -22,7 +22,9 @@ describe('Server', () => {
     const someURL = 'http://www.someurl.com/';
     const frame: HTMLIFrameElement = createIframe('');
     new ServerConnection(frame, { onload: false, url: someURL });
-    expect(frame.src).toEqual(someURL);
+    frame.addEventListener('load', () => {
+      expect(frame.contentWindow && frame.contentWindow.location.href).toEqual(someURL);
+    });
   });
 
   it('calls onload when the frame is loaded and initiation is completed', done => {
