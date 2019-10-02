@@ -28,7 +28,23 @@ export class ServerConnection extends Connection {
         this.init();
       });
     }
+
+    if (this.options.clientInitiates) {
+      this.setupClientInit();
+    }
+    if (!this.options.onload && this.options.url) {
+      this.setSrc(this.options.url);
+    }
     this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
+  }
+
+  private setSrc(url: string) {
+    const iFrameParent = this.frame.parentElement;
+    const iframe = this.frame;
+    this.frame.remove();
+    iframe.setAttribute('src', url);
+    iFrameParent && iFrameParent.appendChild(iframe);
+    this.frame = iframe;
   }
 
   private clientInitiation(e: MessageEvent) {
