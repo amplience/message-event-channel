@@ -24,19 +24,7 @@ export class ServerConnection extends Connection {
     if (this.options.clientInitiates) {
       this.setupClientInit();
     }
-    if (this.options.url) {
-      this.setSrc(this.options.url);
-    }
     this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
-  }
-
-  private setSrc(url: string) {
-    const iFrameParent = this.frame.parentElement;
-    const iframe = this.frame;
-    this.frame.remove();
-    iframe.setAttribute('src', url);
-    iFrameParent && iFrameParent.prepend(iframe);
-    this.frame = iframe;
   }
 
   private clientInitiation(e: MessageEvent) {
@@ -51,7 +39,7 @@ export class ServerConnection extends Connection {
   private setupClientInit() {
     const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
     this.name = 'mio-' + numFrames;
-    const url = new URL(this.options.url ? this.options.url : this.frame.src);
+    const url = new URL(this.frame.src);
     url.searchParams.append('mio-name', this.name);
     this.options.url = url.toString();
     this.options.window.addEventListener('message', (e: MessageEvent) => this.clientInitiation(e));

@@ -20,8 +20,8 @@ describe('Server', () => {
 
   it('sets the src of the iframe when url is provided as an option', () => {
     const someURL = 'http://www.someurl.com/';
-    const frame: HTMLIFrameElement = createIframe('');
-    new ServerConnection(frame, { onload: false, url: someURL });
+    const frame: HTMLIFrameElement = createIframe(someURL);
+    new ServerConnection(frame, { onload: false });
     expect(frame.src).toEqual(someURL);
   });
 
