@@ -35,7 +35,7 @@ export class ServerConnection extends Connection {
     const iframe = this.frame;
     this.frame.remove();
     iframe.setAttribute('src', url);
-    iFrameParent && iFrameParent.appendChild(iframe);
+    iFrameParent && iFrameParent.prepend(iframe);
     this.frame = iframe;
   }
 
