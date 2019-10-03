@@ -24,7 +24,7 @@ export class ServerConnection extends Connection {
     if (this.options.clientInitiates) {
       this.setupClientInit();
     }
-    if (!this.options.onload && this.options.url) {
+    if (this.options.url) {
       this.setSrc(this.options.url);
     }
     this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
