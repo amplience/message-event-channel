@@ -18,13 +18,6 @@ describe('Server', () => {
     expect(frameEvent).not.toHaveBeenCalled();
   });
 
-  it('sets the src of the iframe when url is provided as an option', () => {
-    const someURL = 'http://www.someurl.com/';
-    const frame: HTMLIFrameElement = createIframe('');
-    new ServerConnection(frame, { onload: false, url: someURL });
-    expect(frame.src).toEqual(someURL);
-  });
-
   it('calls onload when the frame is loaded and initiation is completed', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
