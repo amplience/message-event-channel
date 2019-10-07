@@ -21,7 +21,7 @@ describe('Server', () => {
   it('calls onload when the frame is loaded and initiation is completed', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
-    const serverInit = spyOn(server, 'startInit');
+    const serverInit = spyOn(server, 'init');
     frame.onload = () => {
       expect(serverInit).toHaveBeenCalled();
       expect(serverInit).toHaveBeenCalledTimes(1);
@@ -31,11 +31,32 @@ describe('Server', () => {
     appendIframe(frame);
   });
 
-  it('is set to initiated if connection event is sent', done => {
+  it('only initiates when a postmessage message is received, and clientInitiates = true', done => {
+    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const server = new ServerConnection(frame, {
+      onload: false,
+      clientInitiates: true
+    });
+    const serverInit = spyOn(server, 'init');
+    frame.onload = () => {
+      if (frame.contentWindow) {
+        expect(serverInit).not.toHaveBeenCalled();
+        frame.contentWindow.connection.init();
+      }
+    };
+    window.addEventListener('message', (e: MessageEvent) => {
+      expect(serverInit).toHaveBeenCalled();
+      removeIframe(frame);
+      done();
+    });
+    appendIframe(frame);
+  });
+
+  it('is set to connected if connection event is sent', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
     server.on(MIO_EVENTS.CONNECTED, () => {
-      expect(server.initiated).toBeTruthy();
+      expect(server.connected).toBeTruthy();
       removeIframe(frame);
       done();
     });
@@ -47,7 +68,7 @@ describe('Server', () => {
     const server = new ServerConnection(frame);
     frame.onload = () => {
       setTimeout(() => {
-        expect(server.initiated).toBeFalsy();
+        expect(server.connected).toBeFalsy();
         removeIframe(frame);
         done();
       }, 1);
@@ -69,7 +90,7 @@ describe('Server', () => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
     server.on(MIO_EVENTS.CONNECTED, () => {
-      expect(server.initiated).toBeTruthy();
+      expect(server.connected).toBeTruthy();
       removeIframe(frame);
       done();
     });
@@ -106,7 +127,7 @@ describe('Server', () => {
         frame.src = './base/src/frame.html';
       }
       server
-        .request('passthrough', null, 10000)
+        .request('passthrough', null, { timeout: 10000 })
         .then(() => {
           if (i === 9) {
             expect(count).toEqual(9);

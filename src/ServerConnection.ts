@@ -4,7 +4,7 @@ import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
  */
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
-
+  private name!: string;
   /**
    *
    * @param frame The iframe target to setup the connection on.
@@ -16,17 +16,40 @@ export class ServerConnection extends Connection {
    */
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
     super(options);
+    this.frame.classList.add('mio-iframe');
     if (this.options.onload) {
-      frame.addEventListener('load', () => this.startInit());
+      this.frame.addEventListener('load', () => this.init());
     }
-    this.on(MIO_EVENTS.DISCONNECTED, () => (this.initiated = false));
+
+    if (this.options.clientInitiates) {
+      this.setupClientInit();
+    }
+    this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
+  }
+
+  private clientInitiation(e: MessageEvent) {
+    if (e.data === this.name) {
+      if (this.options.debug) {
+        console.log('Server: Client triggered initiation');
+      }
+      this.init();
+    }
+  }
+
+  private setupClientInit() {
+    const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
+    this.name = 'mio-' + numFrames;
+    const url = new URL(this.frame.src);
+    url.searchParams.append('mio-name', this.name);
+    this.options.url = url.toString();
+    this.options.window.addEventListener('message', (e: MessageEvent) => this.clientInitiation(e));
   }
 
   /**
-   * Used to trigger the initiation of a connection manually. To be used if the onload option is disabled.
+   * Used to trigger the initiation of a connection manually. To be used if the onload, and clientInitiates options are disabled.
    */
-  public startInit() {
-    if (!this.frame.contentWindow || !this.frame.src) {
+  public init() {
+    if (!this.frame.contentWindow || !this.frame.src || this.connected) {
       return false;
     }
     this.setupChannel();

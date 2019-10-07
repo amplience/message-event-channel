@@ -40,21 +40,29 @@ export interface RejectMessage {
 /**
  * Options for the connection.
  */
-export interface OptionsObject {
+export interface ConnectionOptions {
   window?: Window;
+  url?: string | undefined;
   timeout?: number;
   connectionTimeout?: number;
   debug?: boolean;
   onload?: boolean;
+  clientInitiates?: boolean;
   targetOrigin?: string;
 }
 
-export interface Options {
+export interface RequestOptions {
+  timeout?: number | boolean;
+}
+
+export interface ConnectionSettings {
   window: Window;
-  timeout: number;
+  url: string | undefined;
+  timeout: number | boolean;
   connectionTimeout: number;
   debug: boolean;
   onload: boolean;
+  clientInitiates: boolean;
   targetOrigin: string;
 }
 
@@ -90,20 +98,22 @@ export class Connection {
   /**
    * Indicates if a connection has been established
    */
-  public initiated: boolean = false;
+  public connected: boolean = false;
   protected port!: MessagePort;
   private backlog: Array<Message> = [];
   protected promises: Promises = {};
   private emitters: Emits = {};
   private readonly timeout: number = 100;
-  protected options: Options;
+  protected options: ConnectionSettings;
   protected connectionTimeout!: number;
-  protected readonly defaultOptions: Options = {
+  protected readonly defaultOptions: ConnectionSettings = {
     window: window,
+    url: undefined,
     connectionTimeout: 200,
     timeout: 2000,
     debug: false,
     onload: true,
+    clientInitiates: false,
     targetOrigin: '*'
   };
 
@@ -115,7 +125,7 @@ export class Connection {
    * @param options.onload Uses the onload event of an iframe to trigger the process for creating a connection. If set to false the connection process needs to be triggered manually. Note a connection will only work if the child frame has loaded. Enabled by default.
    * @param options.targetOrigin Limits the iframe to send messages to only the specified origins. '*' by Default.
    */
-  constructor(options: OptionsObject = {}) {
+  constructor(options: ConnectionOptions = {}) {
     this.options = { ...this.defaultOptions, ...options };
   }
 
@@ -149,21 +159,30 @@ export class Connection {
    * Make a request of the counterpart. It will automatically reject the promise if the timeout time is exceeded.
    * @param event The name of the event to emit
    * @param payload Payload to be sent with the request
-   * @param timeout Override for the default promise timeout
+   * @param options
+   * @param options.timeout Override for the default promise timeout, can be an interger or false
    * @returns A promise that can resolve with any payload
    */
-  public request(event: string, payload?: any, timeout?: number): Promise<any> {
+  public request<T = any>(event: string, payload?: any, options: RequestOptions = {}): Promise<T> {
     return new Promise<any>((resolve, reject) => {
       const uuid: string = event + '_' + Object.keys(this.promises).length;
-      const ct = window.setTimeout(() => reject('timeout'), this.getTimeout(timeout));
+      const timeout = this.getRequestTimeout(options.timeout);
+      let ct: number;
+      if (timeout !== false && typeof timeout === 'number') {
+        ct = window.setTimeout(() => reject('timeout'), timeout);
+      }
       this.promises[uuid] = {
-        resolve: (resolvedData: any) => {
+        resolve: (resolvedData: T) => {
           resolve(resolvedData);
-          clearTimeout(ct);
+          if (ct) {
+            clearTimeout(ct);
+          }
         },
         reject: (error: any) => {
           reject(error);
-          clearTimeout(ct);
+          if (ct) {
+            clearTimeout(ct);
+          }
         }
       };
       this.message({
@@ -179,9 +198,9 @@ export class Connection {
    * Close the port being used to communicate. It will prevent any further messages being sent or received.
    */
   public close() {
-    if (this.initiated) {
+    if (this.connected) {
       this.port.close();
-      this.initiated = false;
+      this.connected = false;
     }
   }
 
@@ -195,7 +214,7 @@ export class Connection {
   }
 
   protected finishInit() {
-    this.initiated = true;
+    this.connected = true;
     clearTimeout(this.connectionTimeout);
     this.emit(MIO_EVENTS.CONNECTED);
     this.completeBacklog();
@@ -271,18 +290,18 @@ export class Connection {
     }
   }
 
-  private isPositiveNumber(num: any): boolean {
-    return typeof num === 'number' && num >= 0;
-  }
-
-  protected getTimeout(num: any): number {
-    if (this.isPositiveNumber(num)) {
-      return num;
-    }
-    if (this.options.timeout && this.isPositiveNumber(this.options.timeout)) {
+  protected getRequestTimeout(timeout: number | boolean | undefined): number | boolean {
+    if (typeof timeout === 'number' && timeout >= 0) {
+      return timeout as number;
+    } else if (typeof timeout === 'number') {
+      return 0;
+    } else if (timeout === true) {
+      return this.options.timeout;
+    } else if (timeout === false) {
+      return false;
+    } else {
       return this.options.timeout;
     }
-    return this.timeout;
   }
 
   protected isClient(): Boolean {
@@ -298,7 +317,7 @@ export class Connection {
     ) {
       force = true;
     }
-    if (!this.initiated && !force) {
+    if (!this.connected && !force) {
       this.backlog.push(message);
     } else if (this.port) {
       this.portMessage(message);
