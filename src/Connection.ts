@@ -42,7 +42,6 @@ export interface RejectMessage {
  */
 export interface ConnectionOptions {
   window?: Window;
-  url?: string | undefined;
   timeout?: number;
   connectionTimeout?: number;
   debug?: boolean;
@@ -57,7 +56,6 @@ export interface RequestOptions {
 
 export interface ConnectionSettings {
   window: Window;
-  url: string | undefined;
   timeout: number | boolean;
   connectionTimeout: number;
   debug: boolean;
@@ -108,7 +106,6 @@ export class Connection {
   protected connectionTimeout!: number;
   protected readonly defaultOptions: ConnectionSettings = {
     window: window,
-    url: undefined,
     connectionTimeout: 200,
     timeout: 2000,
     debug: false,

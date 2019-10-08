@@ -41,7 +41,7 @@ export class ServerConnection extends Connection {
     this.name = 'mio-' + numFrames;
     const url = new URL(this.frame.src);
     url.searchParams.append('mio-name', this.name);
-    this.options.url = url.toString();
+    this.frame.src = url.toString();
     this.options.window.addEventListener('message', (e: MessageEvent) => this.clientInitiation(e));
   }
 
