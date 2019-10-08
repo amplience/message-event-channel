@@ -42,6 +42,7 @@ export class ServerConnection extends Connection {
     if (e.data === this.name) {
       this.connectionStep = CONNECTION_STEPS.CONNECTION;
       this.setConnectionTimeout();
+      this.options.window.removeEventListener('message', this.clientInitListener, false);
       if (this.options.debug) {
         console.log('Server: Client triggered initiation');
       }
@@ -67,7 +68,8 @@ export class ServerConnection extends Connection {
     const url = new URL(this.frame.src);
     url.searchParams.append('mio-name', this.name);
     this.frame.src = url.toString();
-    this.options.window.addEventListener('message', (e: MessageEvent) => this.clientInitiation(e));
+    this.clientInitListener = (e: MessageEvent) => this.clientInitiation(e);
+    this.options.window.addEventListener('message', this.clientInitListener);
   }
 
   /**
