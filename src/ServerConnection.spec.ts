@@ -18,7 +18,7 @@ describe('Server', () => {
     expect(frameEvent).not.toHaveBeenCalled();
   });
 
-  it('calls onload when the frame is loaded and initiation is completed', done => {
+  it('calls init when the frame is loaded and initiation is completed', done => {
     const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
     const server = new ServerConnection(frame);
     const serverInit = spyOn(server, 'init');
@@ -78,8 +78,32 @@ describe('Server', () => {
 
   it('should fire a connection timed out event if no client connects', done => {
     const frame: HTMLIFrameElement = createIframe();
-    const server = new ServerConnection(frame);
-    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, () => {
+    const server = new ServerConnection(frame, { onload: false });
+    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
+      expect(evt.message).toEqual('Connection timed out while waiting for connection.');
+      removeIframe(frame);
+      done();
+    });
+    appendIframe(frame);
+  });
+
+  it('should fire a connection timed out event if client doesnt initiate', done => {
+    const frame: HTMLIFrameElement = createIframe();
+    const server = new ServerConnection(frame, { clientInitiates: true });
+    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
+      expect(evt.message).toEqual('Connection timed out while waiting for initiation from client.');
+      removeIframe(frame);
+      done();
+    });
+    appendIframe(frame);
+  });
+
+  it("should fire a connection timed out event if page doesn't load", done => {
+    // if the connectionTimout is less than the time it takes to load the url it should pass
+    const frame: HTMLIFrameElement = createIframe('https://github.com/');
+    const server = new ServerConnection(frame, { connectionTimeout: 100 });
+    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
+      expect(evt.message).toEqual('Connection timed out while waiting for iframe to load.');
       removeIframe(frame);
       done();
     });
@@ -127,7 +151,7 @@ describe('Server', () => {
         frame.src = './base/src/frame.html';
       }
       server
-        .request('passthrough', null, { timeout: 10000 })
+        .request('passthrough')
         .then(() => {
           if (i === 9) {
             expect(count).toEqual(9);

@@ -1,34 +1,48 @@
 import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
+
+enum CONNECTION_STEPS {
+  CONNECTION = 'waiting for connection.',
+  IFRAME_LOADING = 'waiting for iframe to load.',
+  INITIATION_FROM_CLIENT = 'waiting for initiation from client.'
+}
+
 /**
  * The parent side of the connection.
  */
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
   private name!: string;
+  protected connectionStep: CONNECTION_STEPS = CONNECTION_STEPS.CONNECTION;
+
   /**
    *
    * @param frame The iframe target to setup the connection on.
    * @param options Connection configuration options.
-   * @param options.timeout Default connection timeout (ms). This will trigger a reject on a any request that takes longer than this value. 200ms by default.
+   * @param options.timeout Default request timeout (ms). This will trigger a reject on a any request that takes longer than this value. 200ms by default.
+   * @param options.connectionTimeout Connection timeout (ms). This will trigger the CONNECTION_TIMEOUT if a connection hasn't been established by this time.
    * @param options.debug Enabling uses console.log to output what MIO is doing behind the scenes. Used for debugging. Disabled by default.
    * @param options.onload Uses the onload event of an iframe to trigger the process for creating a connection. If set to false the connection process needs to be triggered manually. Note a connection will only work if the child frame has loaded. Enabled by default.
    * @param options.targetOrigin Limits the iframe to send messages to only the specified origins. '*' by Default.
+   * @param options.clientInitiates Awaits an postMessage (init) trigger from the child before it sets up and sends the MessageChannel port to the child. false by Default.
    */
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
     super(options);
     this.frame.classList.add('mio-iframe');
     if (this.options.onload) {
-      this.frame.addEventListener('load', () => this.init());
+      this.setupLoadInit();
     }
-
     if (this.options.clientInitiates) {
       this.setupClientInit();
     }
+    this.setConnectionTimeout();
     this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
   }
 
   private clientInitiation(e: MessageEvent) {
     if (e.data === this.name) {
+      this.connectionStep = CONNECTION_STEPS.CONNECTION;
+      this.setConnectionTimeout();
+      this.options.window.removeEventListener('message', this.clientInitListener, false);
       if (this.options.debug) {
         console.log('Server: Client triggered initiation');
       }
@@ -36,13 +50,26 @@ export class ServerConnection extends Connection {
     }
   }
 
+  private setupLoadInit() {
+    this.connectionStep = CONNECTION_STEPS.IFRAME_LOADING;
+    this.frame.addEventListener('load', () => {
+      this.connectionStep = this.options.clientInitiates
+        ? CONNECTION_STEPS.INITIATION_FROM_CLIENT
+        : CONNECTION_STEPS.CONNECTION;
+      this.setConnectionTimeout();
+      this.init();
+    });
+  }
+
   private setupClientInit() {
+    this.connectionStep = CONNECTION_STEPS.INITIATION_FROM_CLIENT;
     const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
     this.name = 'mio-' + numFrames;
     const url = new URL(this.frame.src);
     url.searchParams.append('mio-name', this.name);
-    this.options.url = url.toString();
-    this.options.window.addEventListener('message', (e: MessageEvent) => this.clientInitiation(e));
+    this.frame.src = url.toString();
+    this.clientInitListener = (e: MessageEvent) => this.clientInitiation(e);
+    this.options.window.addEventListener('message', this.clientInitListener);
   }
 
   /**
@@ -56,9 +83,6 @@ export class ServerConnection extends Connection {
     this.initPortEvents();
     this.listenForHandshake();
     this.sendPortToClient();
-    this.connectionTimeout = window.setTimeout(() => {
-      this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
-    }, this.options.connectionTimeout);
   }
 
   private sendPortToClient() {

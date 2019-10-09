@@ -8,9 +8,11 @@ export class ClientConnection extends Connection {
     super(options);
     this.messageListener = (e: MessageEvent) => this.messageHandler(e);
     this.options.window.addEventListener('message', this.messageListener);
-    this.connectionTimeout = window.setTimeout(() => {
-      this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
-    }, this.options.connectionTimeout);
+    if (this.options.connectionTimeout !== false) {
+      this.connectionTimeout = window.setTimeout(() => {
+        this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
+      }, Number(this.options.connectionTimeout));
+    }
   }
 
   public init() {
