@@ -66,6 +66,12 @@ export interface ConnectionSettings {
 
 type Message = ResolveMessage | RejectMessage | EmitMessage | RequestMessage;
 
+declare global {
+  interface Window {
+    msCrypto: Crypto;
+  }
+}
+
 /**
  * The set of possible message types.
  */
@@ -165,7 +171,7 @@ export class Connection {
    */
   public request<T = any>(event: string, payload?: any, options: RequestOptions = {}): Promise<T> {
     return new Promise<any>((resolve, reject) => {
-      const uuid: string = event + '_' + Object.keys(this.promises).length;
+      const uuid: string = this.uuidv4();
       const timeout = this.getRequestTimeout(options.timeout);
       let ct: number;
       if (timeout !== false && typeof timeout === 'number') {
@@ -221,6 +227,13 @@ export class Connection {
         });
       }, Number(this.options.connectionTimeout));
     }
+  }
+
+  private uuidv4(): string {
+    const crypt = window.crypto || window.msCrypto;
+    return (([1e7] as any) + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c: any) =>
+      (c ^ (crypt.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+    );
   }
 
   protected clearConnectionTimeout() {
