@@ -1,3 +1,5 @@
+import 'url-polyfill';
+
 export * from './Operator';
 export * from './Connection';
 export * from './ClientConnection';

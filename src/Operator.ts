@@ -5,8 +5,6 @@ import { ConnectionOptions, Connection, RequestOptions } from './Connection';
 export class Operator {
   private connections: Array<Connection> = [];
 
-  constructor() {}
-
   /**
    * Connect method will create and return a [[Connection]] instance.
    * The connection will be placed under the management of the Operator until [[close]] is called.
