@@ -19,14 +19,14 @@ describe('Server', () => {
   });
 
   it("doesn't attach an event listener to the frame if option:onload is false", () => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const frameEvent = spyOn(frame, 'addEventListener');
     new ServerConnection(frame, { onload: false });
     expect(frameEvent).not.toHaveBeenCalled();
   });
 
   it('calls init when the frame is loaded and initiation is completed', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
     const serverInit = spyOn(server, 'init');
     frame.onload = () => {
@@ -39,7 +39,7 @@ describe('Server', () => {
   });
 
   it('only initiates when a postmessage message is received, and clientInitiates = true', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame, {
       onload: false,
       clientInitiates: true
@@ -60,7 +60,7 @@ describe('Server', () => {
   });
 
   it('is set to connected if connection event is sent', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
     server.on(MIO_EVENTS.CONNECTED, () => {
       expect(server.connected).toBeTruthy();
@@ -118,7 +118,7 @@ describe('Server', () => {
   });
 
   it('should only be initialised once the handshake is received from the child', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
     server.on(MIO_EVENTS.CONNECTED, () => {
       expect(server.connected).toBeTruthy();
@@ -129,7 +129,7 @@ describe('Server', () => {
   });
 
   it('should receive a MIO_EVENTS.DISCONNECTED event when the iframe reloads', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
     let setOnce = false;
     server.on(MIO_EVENTS.CONNECTED, () => {
@@ -147,7 +147,7 @@ describe('Server', () => {
   });
 
   it('should receive all the messages asked for even if the iframe reloads', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
     let count = 0;
     for (let i = 0; i < 10; i++) {
@@ -155,7 +155,7 @@ describe('Server', () => {
         frame.src = '/404.html';
       }
       if (i === 8) {
-        frame.src = './base/src/frame.html';
+        frame.src = './base/test/frame.html';
       }
       server
         .request('passthrough')
