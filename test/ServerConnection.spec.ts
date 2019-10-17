@@ -1,6 +1,13 @@
-import { ServerConnection } from './ServerConnection';
-import { MIO_EVENTS } from './Connection';
+import { ServerConnection } from '../src/ServerConnection';
+import { ClientConnection } from '../src/ClientConnection';
+import { MIO_EVENTS } from '../src/Connection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';
+
+declare global {
+  interface Window {
+    connection: ClientConnection;
+  }
+}
 
 describe('Server', () => {
   it('attaches an event listener to the frame', () => {

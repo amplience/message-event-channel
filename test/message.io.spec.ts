@@ -1,5 +1,5 @@
-import { Operator } from './Operator';
-import { Connection, MIO_EVENTS } from './Connection';
+import { Operator } from '../src/Operator';
+import { Connection, MIO_EVENTS } from '../src/Connection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 
 const mio = new Operator();
