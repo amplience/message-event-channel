@@ -11,7 +11,7 @@ enum CONNECTION_STEPS {
  */
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
-  private id!: string;
+  private name!: string;
   protected connectionStep: CONNECTION_STEPS = CONNECTION_STEPS.CONNECTION;
 
   /**
@@ -39,7 +39,7 @@ export class ServerConnection extends Connection {
   }
 
   private clientInitiation(e: MessageEvent) {
-    if (e.data === this.id) {
+    if (e.data === this.name) {
       this.connectionStep = CONNECTION_STEPS.CONNECTION;
       this.setConnectionTimeout();
       this.options.window.removeEventListener('message', this.clientInitListener, false);
@@ -63,9 +63,10 @@ export class ServerConnection extends Connection {
 
   private setupClientInit() {
     this.connectionStep = CONNECTION_STEPS.INITIATION_FROM_CLIENT;
-    this.id = this.uuidv4();
+    const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
+    this.name = 'mio-' + numFrames;
     const url = new URL(this.frame.src);
-    url.searchParams.append('mio-id', this.id);
+    url.searchParams.append('mio-name', this.name);
     this.frame.src = url.toString();
     this.clientInitListener = (e: MessageEvent) => this.clientInitiation(e);
     this.options.window.addEventListener('message', this.clientInitListener);

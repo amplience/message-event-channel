@@ -21,7 +21,7 @@ export class ClientConnection extends Connection {
 
   public init() {
     const url = new URL(this.options.window.location.toString());
-    const id = url.searchParams.get('mio-id');
+    const id = url.searchParams.get('mio-name');
     if (this.options.debug) {
       console.log('Client: sent postMessage value:', id);
     }
