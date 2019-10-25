@@ -16,7 +16,7 @@ describe('Operator', () => {
     expect(connection instanceof ServerConnection).toBeTruthy();
   });
   it('closes a connection', () => {
-    const frame = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
     const op = new Operator();
     const connection = op.connect(frame);
     const spyClose = spyOn(connection, 'close');
@@ -89,8 +89,8 @@ describe('Operator', () => {
   });
 
   it('resolves with all data when using Operator.requestAll()', done => {
-    const frame = createIframe('./base/src/frame.html');
-    const frame2 = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
+    const frame2 = createIframe('./base/test/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -112,8 +112,8 @@ describe('Operator', () => {
   });
 
   it('rejects on the first promise rejection when using Operator.requestAll()', done => {
-    const frame = createIframe('./base/src/frame.html');
-    const frame2 = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
+    const frame2 = createIframe('./base/test/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -133,8 +133,8 @@ describe('Operator', () => {
   });
 
   it('resolves on the first promise when using Operator.requestRace()', done => {
-    const frame = createIframe('./base/src/frame.html');
-    const frame2 = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
+    const frame2 = createIframe('./base/test/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -152,8 +152,8 @@ describe('Operator', () => {
   });
 
   it('rejects on the first promise rejection when using Operator.requestRace()', done => {
-    const frame = createIframe('./base/src/frame.html');
-    const frame2 = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
+    const frame2 = createIframe('./base/test/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);
@@ -173,8 +173,8 @@ describe('Operator', () => {
   });
 
   it('returns a promise array when using Operator.resolve()', done => {
-    const frame = createIframe('./base/src/frame.html');
-    const frame2 = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
+    const frame2 = createIframe('./base/test/frame.html');
     const timeoutPayload = 100;
     const op = new Operator();
     op.connect(frame);

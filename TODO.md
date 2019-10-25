@@ -1,0 +1,1 @@
+* Support web workers and message ports

@@ -19,7 +19,7 @@ describe('Client', () => {
   });
 
   it('should receive a message event with a port', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     new ServerConnection(frame);
     frame.onload = () => {
       if (!frame.contentWindow) {
@@ -36,7 +36,7 @@ describe('Client', () => {
   });
 
   it('should fire a connection timeout event', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     frame.onload = () => {
       if (!frame.contentWindow) {
         return;
@@ -50,7 +50,7 @@ describe('Client', () => {
   });
 
   it('should initiate when it has received a message event and remove listener', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const connection = new ServerConnection(frame);
     let clientRemove: Function;
     frame.onload = () => {
@@ -71,7 +71,7 @@ describe('Client', () => {
   });
 
   it('should receive a message from the parent', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const connection = new ServerConnection(frame);
     frame.addEventListener('load', () => {
       if (!frame.contentWindow || !frame.src) {
@@ -89,7 +89,7 @@ describe('Client', () => {
   });
 
   it('should receive a message from the parent with data', done => {
-    const frame: HTMLIFrameElement = createIframe('./base/src/frame.html');
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const connection = new ServerConnection(frame);
     const payload = { hello: 'there' };
     frame.addEventListener('load', () => {

@@ -1,4 +1,9 @@
 import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
+
+enum CONNECTION_STEPS {
+  CONNECTION = 'waiting for connection.',
+  HANDSHAKE = 'waiting for handshake.'
+}
 /**
  * The child side of a connection.
  */
@@ -9,19 +14,18 @@ export class ClientConnection extends Connection {
     this.messageListener = (e: MessageEvent) => this.messageHandler(e);
     this.options.window.addEventListener('message', this.messageListener);
     if (this.options.connectionTimeout !== false) {
-      this.connectionTimeout = window.setTimeout(() => {
-        this.handleMessage({ type: MESSAGE_TYPE.EMIT, event: MIO_EVENTS.CONNECTION_TIMEOUT });
-      }, Number(this.options.connectionTimeout));
+      this.connectionStep = CONNECTION_STEPS.CONNECTION;
+      this.setConnectionTimeout();
     }
   }
 
   public init() {
     const url = new URL(this.options.window.location.toString());
-    const name = url.searchParams.get('mio-name');
+    const id = url.searchParams.get('mio-name');
     if (this.options.debug) {
-      console.log('Client: sent postMessage value:', name);
+      console.log('Client: sent postMessage value:', id);
     }
-    this.options.window.parent.postMessage(name, this.options.targetOrigin);
+    this.options.window.parent.postMessage(id, this.options.targetOrigin);
   }
 
   private messageHandler(e: MessageEvent) {
@@ -34,10 +38,18 @@ export class ClientConnection extends Connection {
   }
 
   protected listenForHandshake() {
-    this.request(MIO_EVENTS.HANDSHAKE).then(() => {
-      this.addBeforeUnloadEvent();
-      this.finishInit();
-    });
+    if (this.options.connectionTimeout !== false) {
+      this.connectionStep = CONNECTION_STEPS.HANDSHAKE;
+      this.setConnectionTimeout();
+    }
+    this.request(MIO_EVENTS.HANDSHAKE)
+      .then(() => {
+        this.addBeforeUnloadEvent();
+        this.finishInit();
+      })
+      .catch((e: any) => {
+        this.handleError(e);
+      });
   }
 
   protected addBeforeUnloadEvent() {

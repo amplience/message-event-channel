@@ -1,5 +1,5 @@
-import { Operator } from './Operator';
-import { Connection, MIO_EVENTS } from './Connection';
+import { Operator } from '../src/Operator';
+import { Connection, MIO_EVENTS } from '../src/Connection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 
 const mio = new Operator();
@@ -15,7 +15,7 @@ describe('mio', () => {
   });
 
   it('it should emit an connection event', done => {
-    const frame = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
     const connection = mio.connect(frame);
     connection.on(MIO_EVENTS.CONNECTED, (data: any) => {
       expect(data).toBeUndefined();
@@ -26,7 +26,7 @@ describe('mio', () => {
   });
 
   it('it should return the data that was sent to it', done => {
-    const frame = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
     const requestJSON = {
       hello: 'there',
       test: true
@@ -44,7 +44,7 @@ describe('mio', () => {
   });
 
   it('it should catch when response rejects', done => {
-    const frame = createIframe('./base/src/frame.html');
+    const frame = createIframe('./base/test/frame.html');
     const requestJSON = {
       hello: 'there',
       test: true
