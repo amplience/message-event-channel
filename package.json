@@ -1,7 +1,7 @@
 {
   "name": "message.io",
   "umd": "mio",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "description": "",
   "keywords": [],
   "main": "dist/message-io.umd.js",
