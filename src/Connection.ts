@@ -8,7 +8,7 @@ export interface MPromise {
 }
 
 export interface Emits {
-  [key: string]: Function;
+  [key: string]: Function[];
 }
 
 export interface EmitMessage {
@@ -157,7 +157,11 @@ export class Connection {
    * @return Returns Connection instance.
    */
   public on(event: string, callback: Function) {
-    this.emitters[event] = callback;
+    if (this.emitters[event] && Array.isArray(this.emitters[event])) {
+      this.emitters[event].push(callback);
+    } else {
+      this.emitters[event] = [callback];
+    }
     return this;
   }
 
@@ -280,33 +284,35 @@ export class Connection {
     }
     switch (message.type) {
       case MESSAGE_TYPE.EMIT:
-        if (!this.emitters[message.event]) {
+        if (!this.emitters[message.event] || !Array.isArray(this.emitters[message.event])) {
           return;
         }
-        this.emitters[message.event](message.payload);
+        this.emitters[message.event].forEach((cb: Function) => cb(message.payload));
         break;
       case MESSAGE_TYPE.REQUEST:
-        if (!this.emitters[message.event]) {
+        if (!this.emitters[message.event] || !Array.isArray(this.emitters[message.event])) {
           return;
         }
-        this.emitters[message.event](
-          message.payload,
-          (payload: any) => {
-            this.message({
-              id: message.id,
-              type: MESSAGE_TYPE.RESOLVE,
-              event: message.event,
-              payload
-            });
-          },
-          (payload: any) => {
-            this.message({
-              id: message.id,
-              type: MESSAGE_TYPE.REJECT,
-              event: message.event,
-              payload
-            });
-          }
+        this.emitters[message.event].forEach((cb: Function) =>
+          cb(
+            message.payload,
+            (payload: any) => {
+              this.message({
+                id: message.id,
+                type: MESSAGE_TYPE.RESOLVE,
+                event: message.event,
+                payload
+              });
+            },
+            (payload: any) => {
+              this.message({
+                id: message.id,
+                type: MESSAGE_TYPE.REJECT,
+                event: message.event,
+                payload
+              });
+            }
+          )
         );
         break;
       case MESSAGE_TYPE.RESOLVE:

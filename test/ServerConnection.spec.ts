@@ -51,11 +51,60 @@ describe('Server', () => {
         frame.contentWindow.connection.init();
       }
     };
-    window.addEventListener('message', (e: MessageEvent) => {
+    const handler = (e: MessageEvent) => {
       expect(serverInit).toHaveBeenCalled();
+      window.removeEventListener('message', handler);
       removeIframe(frame);
       done();
+    };
+    window.addEventListener('message', handler);
+    appendIframe(frame);
+  });
+
+  it('Client initiation triggers debug message', done => {
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
+    const server = new ServerConnection(frame, {
+      onload: false,
+      clientInitiates: true,
+      debug: true
     });
+    const log = spyOn(console, 'log');
+    frame.onload = () => {
+      if (frame.contentWindow) {
+        frame.contentWindow.connection.init();
+      }
+    };
+    const handler = (e: MessageEvent) => {
+      expect(log).toHaveBeenCalled();
+      expect(log).toHaveBeenCalledWith('Server: Client triggered initiation');
+      window.removeEventListener('message', handler);
+      removeIframe(frame);
+      done();
+    };
+    window.addEventListener('message', handler);
+    appendIframe(frame);
+  });
+
+  it('just any postmessage from child should not trigger an client initiation', done => {
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
+    const server = new ServerConnection(frame, {
+      onload: false,
+      clientInitiates: true,
+      debug: true
+    });
+    const init = spyOn(server, 'init');
+    frame.onload = () => {
+      if (frame.contentWindow) {
+        frame.contentWindow.parent.postMessage('blah', '*');
+      }
+    };
+    const handler = (e: MessageEvent) => {
+      expect(server.init).not.toHaveBeenCalled();
+      window.removeEventListener('message', handler);
+      removeIframe(frame);
+      done();
+    };
+    window.addEventListener('message', handler);
     appendIframe(frame);
   });
 
@@ -81,6 +130,29 @@ describe('Server', () => {
       }, 1);
     };
     appendIframe(frame);
+  });
+
+  it('init should return false if already connected', () => {
+    const frame: HTMLIFrameElement = createIframe();
+    const server = new ServerConnection(frame, { onload: false });
+    server.connected = true;
+    const init = server.init();
+    expect(init).toEqual(false);
+  });
+
+  it('init should return false if already connected', () => {
+    const frame: HTMLIFrameElement = createIframe('https://github.com/');
+    const server = new ServerConnection(frame, { onload: false });
+    server.connected = true;
+    const init = server.init();
+    expect(init).toEqual(false);
+  });
+
+  it('init should return false if frame has no url', () => {
+    const frame: HTMLIFrameElement = createIframe();
+    const server = new ServerConnection(frame, { onload: false });
+    const init = server.init();
+    expect(init).toEqual(false);
   });
 
   it('should fire a connection timed out event if no client connects', done => {
@@ -142,6 +214,26 @@ describe('Server', () => {
       expect(arg).toBeUndefined();
       removeIframe(frame);
       done();
+    });
+    appendIframe(frame);
+  });
+
+  it('a MIO_EVENTS.DISCONNECTED event should set connected=false', done => {
+    const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
+    const server = new ServerConnection(frame, { debug: true });
+    let setOnce = false;
+    server.on(MIO_EVENTS.CONNECTED, () => {
+      if (!setOnce) {
+        frame.src = '/404.html';
+        setOnce = true;
+      }
+    });
+    server.on(MIO_EVENTS.DISCONNECTED, () => {
+      setTimeout(() => {
+        expect(server.connected).toEqual(false);
+        removeIframe(frame);
+        done();
+      });
     });
     appendIframe(frame);
   });
