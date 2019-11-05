@@ -10,15 +10,17 @@ module.exports = function(config) {
     ],
     preprocessors: {
       'src/**/*.ts': ['karma-typescript'],
-      'test/**/*.ts': ['karma-typescript'],
-      './src/**/!(*spec).ts': ['karma-typescript', 'coverage']
+      'test/**/*.ts': ['karma-typescript']
     },
-    reporters: ['dots', 'coverage', 'karma-typescript'],
+    reporters: ['dots', 'karma-typescript'],
     browsers: ['ChromeHeadless', 'Firefox'],
-    coverageReporter: {
-      type: 'text',
-      dir: 'coverage/'
+    karmaTypescriptConfig: {
+      reports: {
+        text: null,
+        'text-summary': null,
+        html: 'coverage/'
+      }
     },
-    singleRun: true
+    singleRun: false
   });
 };
