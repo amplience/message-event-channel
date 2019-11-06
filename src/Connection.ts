@@ -334,7 +334,7 @@ export class Connection {
 
   protected getRequestTimeout(timeout: number | boolean | undefined): number | boolean {
     if (typeof timeout === 'number' && timeout >= 0) {
-      return timeout as number;
+      return timeout;
     } else if (typeof timeout === 'number') {
       return 0;
     } else if (timeout === true) {

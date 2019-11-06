@@ -168,7 +168,7 @@ describe('Server', () => {
 
   it('should fire a connection timed out event if client doesnt initiate', done => {
     const frame: HTMLIFrameElement = createIframe();
-    const server = new ServerConnection(frame, { clientInitiates: true });
+    const server = new ServerConnection(frame, { clientInitiates: true, connectionTimeout: 100 });
     server.on(MC_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
       expect(evt.message).toEqual('Connection timed out while waiting for initiation from client.');
       removeIframe(frame);
