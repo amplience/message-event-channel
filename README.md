@@ -83,7 +83,7 @@ frame.src = "./frame.html";
 `/frame.html`
 
 ```js
-import { mio } from 'message-event-channel';
+import { mc } from 'message-event-channel';
 const connection = mc.connect();
 connection.on('some-payload', (payload, resolve, reject)=>{
   resolve({hello: 'world'})
