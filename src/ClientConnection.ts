@@ -1,4 +1,4 @@
-import { Connection, MIO_EVENTS  } from './Connection';
+import { Connection, MIO_EVENTS } from './Connection';
 
 enum CONNECTION_STEPS {
   CONNECTION = 'waiting for connection.',

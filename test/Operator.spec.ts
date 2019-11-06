@@ -4,7 +4,6 @@ import { ServerConnection } from '../src/ServerConnection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 import { ConnectionOptions } from '../src/Connection';
 
-
 describe('Operator', () => {
   it('creates a client connection without an iframe', () => {
     const op = new Operator();
@@ -13,7 +12,7 @@ describe('Operator', () => {
   });
   it('creates a server connection with an iframe', () => {
     const frame = createIframe();
-    const options = new class implements ConnectionOptions {};
+    const options = new (class implements ConnectionOptions {})();
     const op = new Operator();
     const connection = op.connect(frame, options);
     expect(connection instanceof ServerConnection).toBeTruthy();
