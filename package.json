@@ -1,7 +1,7 @@
 {
   "name": "message-event-channel",
   "umd": "mc",
-  "version": "0.2.0",
+  "version": "0.0.0-development",
   "description": "",
   "keywords": [],
   "main": "dist/message-event-channel.umd.js",
@@ -30,7 +30,9 @@
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
-    "travis-deploy-once": "travis-deploy-once"
+    "travis-deploy-once": "travis-deploy-once",
+    "prepush": "npm run test:prod && npm run build",
+    "commitmsg": "commitlint -E HUSKY_GIT_PARAMS"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -82,7 +84,7 @@
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.24.3",
-    "semantic-release": "^15.9.16",
+    "semantic-release": "^15.13.30",
     "shelljs": "^0.8.3",
     "start-server-and-test": "^1.9.2",
     "travis-deploy-once": "^5.0.9",
@@ -95,5 +97,8 @@
   },
   "dependencies": {
     "url-polyfill": "^1.1.7"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }
