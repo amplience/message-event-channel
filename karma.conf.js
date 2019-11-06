@@ -5,7 +5,7 @@ module.exports = function(config) {
       { pattern: 'src/**/*.ts' },
       { pattern: 'test/**/*.ts' },
       { pattern: 'test/**/*.html', included: false, served: true },
-      { pattern: 'dist/message-io.umd.js', included: false, served: true },
+      { pattern: 'dist/message-event-channel.umd.js', included: false, served: true },
       { pattern: 'dist/**/*.map', included: false, served: true }
     ],
     preprocessors: {
@@ -13,7 +13,7 @@ module.exports = function(config) {
       'test/**/*.ts': ['karma-typescript']
     },
     reporters: ['dots', 'karma-typescript'],
-    browsers: ['ChromeHeadless', 'Firefox'],
+    browsers: ['Chrome'],
     karmaTypescriptConfig: {
       reports: {
         text: null,

@@ -1,12 +1,12 @@
 {
-  "name": "message.io",
-  "umd": "mio",
+  "name": "message-event-channel",
+  "umd": "mc",
   "version": "0.2.0",
   "description": "",
   "keywords": [],
-  "main": "dist/message-io.umd.js",
-  "module": "dist/message-io.esm.js",
-  "typings": "dist/types/message.io.d.ts",
+  "main": "dist/message-event-channel.umd.js",
+  "module": "dist/message-event-channel.esm.js",
+  "typings": "dist/types/message-event-channel.d.ts",
   "author": "ccorbett <ccorbett@amplience.com>",
   "repository": {
     "type": "git",

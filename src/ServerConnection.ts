@@ -1,4 +1,4 @@
-import { Connection, MIO_EVENTS, MESSAGE_TYPE } from './Connection';
+import { Connection, MC_EVENTS, MESSAGE_TYPE } from './Connection';
 
 enum CONNECTION_STEPS {
   CONNECTION = 'waiting for connection.',
@@ -20,14 +20,14 @@ export class ServerConnection extends Connection {
    * @param options Connection configuration options.
    * @param options.timeout Default request timeout (ms). This will trigger a reject on a any request that takes longer than this value. 200ms by default.
    * @param options.connectionTimeout Connection timeout (ms). This will trigger the CONNECTION_TIMEOUT if a connection hasn't been established by this time.
-   * @param options.debug Enabling uses console.log to output what MIO is doing behind the scenes. Used for debugging. Disabled by default.
+   * @param options.debug Enabling uses console.log to output what MC is doing behind the scenes. Used for debugging. Disabled by default.
    * @param options.onload Uses the onload event of an iframe to trigger the process for creating a connection. If set to false the connection process needs to be triggered manually. Note a connection will only work if the child frame has loaded. Enabled by default.
    * @param options.targetOrigin Limits the iframe to send messages to only the specified origins. '*' by Default.
    * @param options.clientInitiates Awaits an postMessage (init) trigger from the child before it sets up and sends the MessageChannel port to the child. false by Default.
    */
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
     super(options);
-    this.frame.classList.add('mio-iframe');
+    this.frame.classList.add('mc-iframe');
     if (this.options.onload) {
       this.setupLoadInit();
     }
@@ -35,7 +35,7 @@ export class ServerConnection extends Connection {
       this.setupClientInit();
     }
     this.setConnectionTimeout();
-    this.on(MIO_EVENTS.DISCONNECTED, () => (this.connected = false));
+    this.on(MC_EVENTS.DISCONNECTED, () => (this.connected = false));
   }
 
   private clientInitiation(e: MessageEvent) {
@@ -63,10 +63,10 @@ export class ServerConnection extends Connection {
 
   private setupClientInit() {
     this.connectionStep = CONNECTION_STEPS.INITIATION_FROM_CLIENT;
-    const numFrames = this.options.window.document.querySelectorAll('iframe.mio-iframe').length;
-    this.name = 'mio-' + numFrames;
+    const numFrames = this.options.window.document.querySelectorAll('iframe.mc-iframe').length;
+    this.name = 'mc-' + numFrames;
     const url = new URL(this.frame.src);
-    url.searchParams.append('mio-name', this.name);
+    url.searchParams.append('mc-name', this.name);
     this.frame.src = url.toString();
     this.clientInitListener = (e: MessageEvent) => this.clientInitiation(e);
     this.options.window.addEventListener('message', this.clientInitListener);
@@ -92,7 +92,7 @@ export class ServerConnection extends Connection {
   }
 
   private listenForHandshake() {
-    this.on(MIO_EVENTS.HANDSHAKE, (payload: any, resolve: Function) => {
+    this.on(MC_EVENTS.HANDSHAKE, (payload: any, resolve: Function) => {
       this.finishInit();
       resolve(payload);
     });

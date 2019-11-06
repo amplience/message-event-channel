@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="" />
-    <script src="../dist/message-io.umd.js"></script>
+    <script src="../dist/message-event-channel.umd.js"></script>
     <title>Test</title>
   </head>
   <body>
     <div id="content"></div>
     <script>
-      const o = new mio.Operator();
+      const o = new mc.Operator();
       window.connection = o.connect(null, { debug: false });
       window.connection.on('passthrough-fail', (payload, resolve, reject) => {
         reject(payload);

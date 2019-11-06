@@ -86,11 +86,11 @@ export enum MESSAGE_TYPE {
 /**
  * The set of internally used event triggers that can be bound to.
  */
-export enum MIO_EVENTS {
-  HANDSHAKE = 'mio-handshake',
-  CONNECTED = 'mio-connected',
-  DISCONNECTED = 'mio-disconnected',
-  CONNECTION_TIMEOUT = 'mio-connection-timeout'
+export enum MC_EVENTS {
+  HANDSHAKE = 'mc-handshake',
+  CONNECTED = 'mc-connected',
+  DISCONNECTED = 'mc-disconnected',
+  CONNECTION_TIMEOUT = 'mc-connection-timeout'
 }
 /**
  * Connection Base Class.
@@ -126,7 +126,7 @@ export class Connection {
    * @param options Connection configuration options
    * @param options.timeout Default request timeout (ms). This will trigger a reject on a any request that takes longer than this value. 200ms by default.
    * @param options.connectionTimeout Connection timeout (ms). This will trigger the CONNECTION_TIMEOUT if a connection hasn't been established by this time.
-   * @param options.debug Enabling uses console.log to output what MIO is doing behind the scenes. Used for debugging. Disabled by default.
+   * @param options.debug Enabling uses console.log to output what MC is doing behind the scenes. Used for debugging. Disabled by default.
    * @param options.onload Uses the onload event of an iframe to trigger the process for creating a connection. If set to false the connection process needs to be triggered manually. Note a connection will only work if the child frame has loaded. Enabled by default.
    * @param options.targetOrigin Limits the iframe to send messages to only the specified origins. '*' by Default.
    * @param options.clientInitiates Awaits an postMessage (init) trigger from the child before it sets up and sends the MessageChannel port to the child. false by Default.
@@ -226,7 +226,7 @@ export class Connection {
         }
         this.handleMessage({
           type: MESSAGE_TYPE.EMIT,
-          event: MIO_EVENTS.CONNECTION_TIMEOUT,
+          event: MC_EVENTS.CONNECTION_TIMEOUT,
           payload: { message: 'Connection timed out while ' + this.connectionStep }
         });
       }, Number(this.options.connectionTimeout));
@@ -256,7 +256,7 @@ export class Connection {
   protected finishInit() {
     this.connected = true;
     this.clearConnectionTimeout();
-    this.emit(MIO_EVENTS.CONNECTED);
+    this.emit(MC_EVENTS.CONNECTED);
     this.completeBacklog();
   }
 
@@ -353,9 +353,9 @@ export class Connection {
   protected message(message: Message) {
     let force = false;
     if (
-      message.event === MIO_EVENTS.HANDSHAKE ||
-      message.event === MIO_EVENTS.CONNECTED ||
-      message.event === MIO_EVENTS.DISCONNECTED
+      message.event === MC_EVENTS.HANDSHAKE ||
+      message.event === MC_EVENTS.CONNECTED ||
+      message.event === MC_EVENTS.DISCONNECTED
     ) {
       force = true;
     }

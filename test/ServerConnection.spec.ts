@@ -1,6 +1,6 @@
 import { ServerConnection } from '../src/ServerConnection';
 import { ClientConnection } from '../src/ClientConnection';
-import { MIO_EVENTS } from '../src/Connection';
+import { MC_EVENTS } from '../src/Connection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 
 declare global {
@@ -111,7 +111,7 @@ describe('Server', () => {
   it('is set to connected if connection event is sent', done => {
     const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
-    server.on(MIO_EVENTS.CONNECTED, () => {
+    server.on(MC_EVENTS.CONNECTED, () => {
       expect(server.connected).toBeTruthy();
       removeIframe(frame);
       done();
@@ -158,7 +158,7 @@ describe('Server', () => {
   it('should fire a connection timed out event if no client connects', done => {
     const frame: HTMLIFrameElement = createIframe();
     const server = new ServerConnection(frame, { onload: false });
-    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
+    server.on(MC_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
       expect(evt.message).toEqual('Connection timed out while waiting for connection.');
       removeIframe(frame);
       done();
@@ -169,7 +169,7 @@ describe('Server', () => {
   it('should fire a connection timed out event if client doesnt initiate', done => {
     const frame: HTMLIFrameElement = createIframe();
     const server = new ServerConnection(frame, { clientInitiates: true });
-    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
+    server.on(MC_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
       expect(evt.message).toEqual('Connection timed out while waiting for initiation from client.');
       removeIframe(frame);
       done();
@@ -181,7 +181,7 @@ describe('Server', () => {
     // if the connectionTimout is less than the time it takes to load the url it should pass
     const frame: HTMLIFrameElement = createIframe('https://github.com/');
     const server = new ServerConnection(frame, { connectionTimeout: 100 });
-    server.on(MIO_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
+    server.on(MC_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
       expect(evt.message).toEqual('Connection timed out while waiting for iframe to load.');
       removeIframe(frame);
       done();
@@ -192,7 +192,7 @@ describe('Server', () => {
   it('should only be initialised once the handshake is received from the child', done => {
     const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
-    server.on(MIO_EVENTS.CONNECTED, () => {
+    server.on(MC_EVENTS.CONNECTED, () => {
       expect(server.connected).toBeTruthy();
       removeIframe(frame);
       done();
@@ -200,17 +200,17 @@ describe('Server', () => {
     appendIframe(frame);
   });
 
-  it('should receive a MIO_EVENTS.DISCONNECTED event when the iframe reloads', done => {
+  it('should receive a MC_EVENTS.DISCONNECTED event when the iframe reloads', done => {
     const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame);
     let setOnce = false;
-    server.on(MIO_EVENTS.CONNECTED, () => {
+    server.on(MC_EVENTS.CONNECTED, () => {
       if (!setOnce) {
         frame.src = '/404.html';
         setOnce = true;
       }
     });
-    server.on(MIO_EVENTS.DISCONNECTED, (arg: any) => {
+    server.on(MC_EVENTS.DISCONNECTED, (arg: any) => {
       expect(arg).toBeUndefined();
       removeIframe(frame);
       done();
@@ -218,17 +218,17 @@ describe('Server', () => {
     appendIframe(frame);
   });
 
-  it('a MIO_EVENTS.DISCONNECTED event should set connected=false', done => {
+  it('a MC_EVENTS.DISCONNECTED event should set connected=false', done => {
     const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
     const server = new ServerConnection(frame, { debug: true });
     let setOnce = false;
-    server.on(MIO_EVENTS.CONNECTED, () => {
+    server.on(MC_EVENTS.CONNECTED, () => {
       if (!setOnce) {
         frame.src = '/404.html';
         setOnce = true;
       }
     });
-    server.on(MIO_EVENTS.DISCONNECTED, () => {
+    server.on(MC_EVENTS.DISCONNECTED, () => {
       setTimeout(() => {
         expect(server.connected).toEqual(false);
         removeIframe(frame);

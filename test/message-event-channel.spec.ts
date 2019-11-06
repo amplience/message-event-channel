@@ -1,23 +1,23 @@
 import { Operator } from '../src/Operator';
-import { Connection, MIO_EVENTS } from '../src/Connection';
+import { Connection, MC_EVENTS } from '../src/Connection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 
-const mio = new Operator();
+const mc = new Operator();
 
-describe('mio', () => {
+describe('mc', () => {
   it('should be an instance of Operator', () => {
-    expect(mio instanceof Operator).toBeTruthy();
+    expect(mc instanceof Operator).toBeTruthy();
   });
 
   it('a connection should be an instance of Connection', () => {
-    const connection = mio.connect();
+    const connection = mc.connect();
     expect(connection instanceof Connection).toBeTruthy();
   });
 
   it('it should emit an connection event', done => {
     const frame = createIframe('./base/test/frame.html');
-    const connection = mio.connect(frame);
-    connection.on(MIO_EVENTS.CONNECTED, (data: any) => {
+    const connection = mc.connect(frame);
+    connection.on(MC_EVENTS.CONNECTED, (data: any) => {
       expect(data).toBeUndefined();
       removeIframe(frame);
       done();
@@ -31,7 +31,7 @@ describe('mio', () => {
       hello: 'there',
       test: true
     };
-    const connection = mio.connect(frame);
+    const connection = mc.connect(frame);
     connection
       .request('passthrough', requestJSON)
       .then(dataReturned => {
@@ -49,7 +49,7 @@ describe('mio', () => {
       hello: 'there',
       test: true
     };
-    const connection = mio.connect(frame);
+    const connection = mc.connect(frame);
     connection
       .request('passthrough-fail', requestJSON)
       .then(done.fail)

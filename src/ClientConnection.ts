@@ -1,4 +1,4 @@
-import { Connection, MIO_EVENTS } from './Connection';
+import { Connection, MC_EVENTS } from './Connection';
 
 enum CONNECTION_STEPS {
   CONNECTION = 'waiting for connection.',
@@ -21,7 +21,7 @@ export class ClientConnection extends Connection {
 
   public init() {
     const url = new URL(this.options.window.location.toString());
-    const id = url.searchParams.get('mio-name');
+    const id = url.searchParams.get('mc-name');
     if (this.options.debug) {
       console.log('Client: sent postMessage value:', id);
     }
@@ -42,7 +42,7 @@ export class ClientConnection extends Connection {
       this.connectionStep = CONNECTION_STEPS.HANDSHAKE;
       this.setConnectionTimeout();
     }
-    this.request(MIO_EVENTS.HANDSHAKE)
+    this.request(MC_EVENTS.HANDSHAKE)
       .then(() => {
         this.addBeforeUnloadEvent();
         this.finishInit();
@@ -54,7 +54,7 @@ export class ClientConnection extends Connection {
 
   protected addBeforeUnloadEvent() {
     this.options.window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
-      this.emit(MIO_EVENTS.DISCONNECTED);
+      this.emit(MC_EVENTS.DISCONNECTED);
     });
   }
 

@@ -1,6 +1,6 @@
 import { ClientConnection } from '../src/ClientConnection';
 import { ServerConnection } from '../src/ServerConnection';
-import { MIO_EVENTS } from '../src/Connection';
+import { MC_EVENTS } from '../src/Connection';
 import { createIframe, appendIframe, removeIframe } from './TestHelpers';
 
 declare global {
@@ -10,7 +10,6 @@ declare global {
 }
 
 describe('ClientConnection', () => {
-
   describe('constructor()', () => {
     it('should add a window message listener', () => {
       const windowEvent = spyOn(window, 'addEventListener');
@@ -36,7 +35,7 @@ describe('ClientConnection', () => {
       };
       appendIframe(frame);
     });
-  
+
     it('should fire a connection timeout event', done => {
       const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
       frame.onload = () => {
@@ -44,13 +43,13 @@ describe('ClientConnection', () => {
           return;
         }
         const window: Window = frame.contentWindow;
-        window.connection.on(MIO_EVENTS.CONNECTION_TIMEOUT, () => {
+        window.connection.on(MC_EVENTS.CONNECTION_TIMEOUT, () => {
           done();
         });
       };
       appendIframe(frame);
     });
-  
+
     it('should initiate when it has received a message event and remove listener', done => {
       const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
       const connection = new ServerConnection(frame);
@@ -62,7 +61,7 @@ describe('ClientConnection', () => {
         const window: Window = frame.contentWindow;
         clientRemove = spyOn(window, 'removeEventListener');
       };
-      connection.on(MIO_EVENTS.CONNECTED, () => {
+      connection.on(MC_EVENTS.CONNECTED, () => {
         expect(clientRemove).toHaveBeenCalled();
         expect(clientRemove).toHaveBeenCalledTimes(1);
         expect(clientRemove).toHaveBeenCalledWith('message', jasmine.any(Function));
@@ -71,7 +70,7 @@ describe('ClientConnection', () => {
       });
       appendIframe(frame);
     });
-  
+
     it('should receive a message from the parent', done => {
       const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
       const connection = new ServerConnection(frame);
@@ -89,7 +88,7 @@ describe('ClientConnection', () => {
       connection.emit('event');
       appendIframe(frame);
     });
-  
+
     it('should receive a message from the parent with data', done => {
       const frame: HTMLIFrameElement = createIframe('./base/test/frame.html');
       const connection = new ServerConnection(frame);
@@ -112,7 +111,7 @@ describe('ClientConnection', () => {
 
   describe('init()', () => {
     it('should log the ID if debug is active', () => {
-      const client = new ClientConnection({debug: true});
+      const client = new ClientConnection({ debug: true });
       spyOn(console, 'log');
       client.init();
       expect(console.log).toHaveBeenCalled();
@@ -137,9 +136,9 @@ describe('ClientConnection', () => {
       //@ts-ignore
       spyOn(client.options.window, 'removeEventListener');
       //@ts-ignore
-      client.messageListener({ports: [{port: true}]});
+      client.messageListener({ ports: [{ port: true }] });
       //@ts-ignore
-      expect(client.port).toEqual({port: true});
+      expect(client.port).toEqual({ port: true });
       //@ts-ignore
       expect(client.initPortEvents).toHaveBeenCalled();
       //@ts-ignore
@@ -150,9 +149,9 @@ describe('ClientConnection', () => {
     it('should not do anything if there are not any ports', () => {
       const client = new ClientConnection();
       //@ts-ignore
-      spyOn(client, 'initPortEvents');    
+      spyOn(client, 'initPortEvents');
       //@ts-ignore
-      client.messageListener({ports: []});
+      client.messageListener({ ports: [] });
       //@ts-ignore
       expect(client.initPortEvents).not.toHaveBeenCalled();
     });
@@ -197,8 +196,8 @@ describe('ClientConnection', () => {
       setTimeout(() => {
         //@ts-ignore
         expect(client.handleError).toHaveBeenCalled();
-        done(); 
-      })
+        done();
+      });
     });
   });
 
@@ -224,5 +223,4 @@ describe('ClientConnection', () => {
       expect(isTrue).toEqual(true);
     });
   });
-
 });
