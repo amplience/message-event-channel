@@ -13,7 +13,7 @@ module.exports = function(config) {
       'test/**/*.ts': ['karma-typescript']
     },
     reporters: ['dots', 'karma-typescript'],
-    browsers: ['Chrome'],
+    browsers: ['ChromeHeadless'],
     karmaTypescriptConfig: {
       reports: {
         text: null,
@@ -21,6 +21,6 @@ module.exports = function(config) {
         html: 'coverage/'
       }
     },
-    singleRun: false
+    singleRun: true
   });
 };
