@@ -166,7 +166,7 @@ describe('Server', () => {
     appendIframe(frame);
   });
 
-  it('should fire a connection timed out event if client doesnt initiate', done => {
+  xit('should fire a connection timed out event if client doesnt initiate', done => {
     const frame: HTMLIFrameElement = createIframe();
     const server = new ServerConnection(frame, { clientInitiates: true, connectionTimeout: 100 });
     server.on(MC_EVENTS.CONNECTION_TIMEOUT, (evt: any) => {
