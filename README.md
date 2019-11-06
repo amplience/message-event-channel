@@ -115,8 +115,10 @@ mio.close(connection);
 ```js
 {
   targetOrigin: '*' // limit the connection to a particular origin (reccomended)
-  onload: true, // if the connection should be initialised by an onload event or manually
+  onload: true, // if the connection should be initialised by an onload event or manually using init()
   timeout: 2000, // default time it takes for requests to timeout
   debug: false, // used to enable useful behind-the-scenes info
+  connectionTimeout: 2000 // will trigger the CONNECTION_TIMEOUT event if a connection hasn't been established by this time, can be set to false.
+  clientInitiates: false // Server setting - waits for a init() trigger from the child frame before initiating.
 }
 ```

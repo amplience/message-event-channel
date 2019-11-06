@@ -82,18 +82,13 @@ export class ServerConnection extends Connection {
     this.setupChannel();
     this.initPortEvents();
     this.listenForHandshake();
-    this.sendPortToClient();
+    this.sendPortToClient(this.frame.contentWindow);
   }
 
-  private sendPortToClient() {
-    if (!this.frame.contentWindow || !this.frame.src) {
-      return false;
-    }
-    this.frame.contentWindow.postMessage(
-      null,
-      this.options.targetOrigin ? this.options.targetOrigin : '*',
-      [this.channel.port2]
-    );
+  private sendPortToClient(client: Window) {
+    client.postMessage(null, this.options.targetOrigin ? this.options.targetOrigin : '*', [
+      this.channel.port2
+    ]);
   }
 
   private listenForHandshake() {
