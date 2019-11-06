@@ -10,7 +10,7 @@
   "author": "ccorbett <ccorbett@amplience.com>",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/amplience/message-event-channel.git"
   },
   "license": "MIT",
   "engines": {
