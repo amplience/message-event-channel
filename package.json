@@ -100,6 +100,6 @@
     "url-polyfill": "^1.1.7"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }
