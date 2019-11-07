@@ -23,23 +23,23 @@ Using cdn:
 ```
 # Including
 
-```js
-import { mc } from 'message-event-channel';
-mc.connect();
+```ts
+import { ClientConnection } from 'message-event-channel';
+const connection = new ClientConnection();
 ```
 
 or
 
 ```js
 const mc = require('message-event-channel');
-mc.connect();
+const connection = new mc.ClientConnection();
 ```
 
 or
 ``` html
 <script src="https://unpkg.com/message-event-channel/dist/message-event-channel.umd.js"></script>
 <script>
-  mc.connect();
+  const connection = new mc.ClientConnection();
 </script>
 ```
 
@@ -49,17 +49,19 @@ or
 
 `/parent.html`
 
-```js
+```ts
+import { ServerConnection } from 'message-event-channel';
 const frame = document.querySelector('iframe');
-const connection = mc.connect(frame);
+const connection = new ServerConnection(frame);
 connection.emit('my-event', {hello: 'world'});
 frame.src = "./frame.html";
 ```
 
 `/frame.html`
 
-```js
-const connection = mc.connect();
+```ts
+import { ClientConnection } from 'message-event-channel';
+const connection = new ClientConnection();
 connection.on('my-event', (payload)=>{
   // {hello: "world"}
   console.log(payload)
@@ -70,8 +72,9 @@ connection.on('my-event', (payload)=>{
 
 `/parent.html`
 
-```js
-const connection = mc.connect(frame);
+```ts
+import { ServerConnection } from 'message-event-channel';
+const connection = new ServerConnection(frame);
 connection.request('some-data')
   .then(payload => {
     // {hello: "world"}
@@ -82,9 +85,9 @@ frame.src = "./frame.html";
 
 `/frame.html`
 
-```js
-import { mc } from 'message-event-channel';
-const connection = mc.connect();
+```ts
+import { ClientConnection } from 'message-event-channel';
+const connection = new ClientConnection();
 connection.on('some-payload', (payload, resolve, reject)=>{
   resolve({hello: 'world'})
 });
@@ -94,11 +97,13 @@ connection.on('some-payload', (payload, resolve, reject)=>{
 
 `/parent.html`
 
-```js
-const connection1 = mc.connect(frame1);
-const connection2 = mc.connect(frame2);
-const connection3 = mc.connect(frame3);
-mc.emit('send-to-all');
+```ts
+import { Operator } from 'message-event-channel';
+const operator = new Operator();
+const connection1 = operator.connect(frame1);
+const connection2 = operator.connect(frame2);
+const connection3 = operator.connect(frame3);
+operator.emit('send-to-all');
 ```
 
 ## Close connection
@@ -106,8 +111,9 @@ mc.emit('send-to-all');
 `/parent.html`
 
 ```js
-const connection = mc.connect(frame1);
-mc.close(connection);
+import { ServerConnection } from 'message-event-channel';
+const connection = new ServerConnection(frame);
+connection.close();
 ```
 
 
