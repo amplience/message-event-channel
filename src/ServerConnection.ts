@@ -35,14 +35,14 @@ export class ServerConnection extends Connection {
       this.setupClientInit();
     }
     this.setConnectionTimeout();
-    this.on(MC_EVENTS.DISCONNECTED, () => (this.connected = false));
+    this.on(MC_EVENTS.DISCONNECTED, () => this.close());
   }
 
   private clientInitiation(e: MessageEvent) {
     if (e.data === this.name) {
       this.connectionStep = CONNECTION_STEPS.CONNECTION;
       this.setConnectionTimeout();
-      this.options.window.removeEventListener('message', this.clientInitListener, false);
+      this.options.window.removeEventListener('message', this.messageListener, false);
       if (this.options.debug) {
         console.log('Server: Client triggered initiation');
       }
@@ -68,8 +68,8 @@ export class ServerConnection extends Connection {
     const url = new URL(this.frame.src);
     url.searchParams.append('mc-name', this.name);
     this.frame.src = url.toString();
-    this.clientInitListener = (e: MessageEvent) => this.clientInitiation(e);
-    this.options.window.addEventListener('message', this.clientInitListener);
+    this.messageListener = (e: MessageEvent) => this.clientInitiation(e);
+    this.options.window.addEventListener('message', this.messageListener);
   }
 
   /**

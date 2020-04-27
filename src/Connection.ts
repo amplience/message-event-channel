@@ -110,7 +110,7 @@ export class Connection {
   protected options: ConnectionSettings;
   protected connectionTimeout!: number;
   protected connectionStep: string = '';
-  protected clientInitListener!: any;
+  protected messageListener!: any;
   protected readonly defaultOptions: ConnectionSettings = {
     window: window,
     connectionTimeout: 2000,
@@ -212,8 +212,8 @@ export class Connection {
       this.port.close();
       this.connected = false;
     }
-    if (this.clientInitListener) {
-      this.options.window.removeEventListener('message', this.clientInitListener, false);
+    if (this.messageListener) {
+      this.options.window.removeEventListener('message', this.messageListener, false);
     }
   }
 
@@ -221,8 +221,8 @@ export class Connection {
     clearTimeout(this.connectionTimeout);
     if (this.options.connectionTimeout !== false) {
       this.connectionTimeout = window.setTimeout(() => {
-        if (this.clientInitListener) {
-          this.options.window.removeEventListener('message', this.clientInitListener, false);
+        if (this.messageListener) {
+          this.options.window.removeEventListener('message', this.messageListener, false);
         }
         this.handleMessage({
           type: MESSAGE_TYPE.EMIT,

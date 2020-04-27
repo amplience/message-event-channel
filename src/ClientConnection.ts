@@ -8,7 +8,7 @@ enum CONNECTION_STEPS {
  * The child side of a connection.
  */
 export class ClientConnection extends Connection {
-  private messageListener: any;
+  protected messageListener: any;
   constructor(options: any = {}) {
     super(options);
     this.messageListener = (e: MessageEvent) => this.messageHandler(e);
@@ -55,6 +55,7 @@ export class ClientConnection extends Connection {
   protected addBeforeUnloadEvent() {
     this.options.window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
       this.emit(MC_EVENTS.DISCONNECTED);
+      this.close();
     });
   }
 
