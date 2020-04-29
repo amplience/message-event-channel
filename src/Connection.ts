@@ -103,6 +103,7 @@ export class Connection {
    * Indicates if a connection has been established
    */
   public connected: boolean = false;
+  public id!: string | null;
   protected port!: MessagePort;
   private backlog: Array<Message> = [];
   protected promises: Promises = {};
@@ -256,6 +257,9 @@ export class Connection {
   protected finishInit() {
     this.connected = true;
     this.clearConnectionTimeout();
+    if (this.options.debug) {
+      console.log(`Finished connection on ${this.isClient() ? 'client' : 'server'}`);
+    }
     this.emit(MC_EVENTS.CONNECTED);
     this.completeBacklog();
   }

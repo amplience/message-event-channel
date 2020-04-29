@@ -11,7 +11,6 @@ enum CONNECTION_STEPS {
  */
 export class ServerConnection extends Connection {
   private channel!: MessageChannel;
-  private name!: string;
   protected connectionStep: CONNECTION_STEPS = CONNECTION_STEPS.CONNECTION;
 
   /**
@@ -27,7 +26,6 @@ export class ServerConnection extends Connection {
    */
   constructor(protected frame: HTMLIFrameElement, options: any = {}) {
     super(options);
-    this.frame.classList.add('mc-iframe');
     if (this.options.onload) {
       this.setupLoadInit();
     }
@@ -39,7 +37,7 @@ export class ServerConnection extends Connection {
   }
 
   private clientInitiation(e: MessageEvent) {
-    if (e.data === this.name) {
+    if (e.data === this.id) {
       this.connectionStep = CONNECTION_STEPS.CONNECTION;
       this.setConnectionTimeout();
       this.options.window.removeEventListener('message', this.messageListener, false);
@@ -63,10 +61,9 @@ export class ServerConnection extends Connection {
 
   private setupClientInit() {
     this.connectionStep = CONNECTION_STEPS.INITIATION_FROM_CLIENT;
-    const numFrames = this.options.window.document.querySelectorAll('iframe.mc-iframe').length;
-    this.name = 'mc-' + numFrames;
+    this.id = this.uuidv4();
     const url = new URL(this.frame.src);
-    url.searchParams.append('mc-name', this.name);
+    url.searchParams.set('mc-name', this.id);
     this.frame.src = url.toString();
     this.messageListener = (e: MessageEvent) => this.clientInitiation(e);
     this.options.window.addEventListener('message', this.messageListener);
@@ -93,8 +90,8 @@ export class ServerConnection extends Connection {
 
   private listenForHandshake() {
     this.on(MC_EVENTS.HANDSHAKE, (payload: any, resolve: Function) => {
-      this.finishInit();
       resolve(payload);
+      this.finishInit();
     });
   }
 
