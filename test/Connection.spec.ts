@@ -22,16 +22,16 @@ describe('Connection', () => {
     it('should set timeout if timeout option is passed', async () => {
       const connection = new Connection();
       try {
-        await connection.request('test', {timeout: 1});
-      } catch(e) {
+        await connection.request('test', { timeout: 1 });
+      } catch (e) {
         expect(e).toEqual('timeout');
       }
     });
     it('should set timeout if timeout option is passed', async () => {
       const connection = new Connection();
       try {
-        await connection.request('test', {timeout: 1});
-      } catch(e) {
+        await connection.request('test', { timeout: 1 });
+      } catch (e) {
         expect(e).toEqual('timeout');
       }
     });
@@ -41,7 +41,7 @@ describe('Connection', () => {
     it('should close port if connected', () => {
       const connection = new Connection();
       //@ts-ignore
-      connection.port = {close: () => {}};
+      connection.port = { close: () => {} };
       //@ts-ignore
       spyOn(connection.port, 'close');
       connection.connected = true;
@@ -53,7 +53,7 @@ describe('Connection', () => {
     it('should remove event listener if client inits listener', () => {
       const connection = new Connection();
       //@ts-ignore
-      connection.clientInitListener = true;
+      connection.messageListener = true;
       //@ts-ignore
       spyOn(connection.options.window, 'removeEventListener');
       connection.close();
@@ -64,7 +64,7 @@ describe('Connection', () => {
 
   describe('initPortEvents()', () => {
     it('should handle error on message error', () => {
-      const connection = new Connection({debug: true});
+      const connection = new Connection({ debug: true });
       //@ts-ignore
       connection.port = {};
       //@ts-ignore
@@ -92,7 +92,7 @@ describe('Connection', () => {
       expect(timeout).toEqual(0);
     });
     it('should return options.timeout if timeout is true', () => {
-      const connection = new Connection({timeout: 100});
+      const connection = new Connection({ timeout: 100 });
       //@ts-ignore
       const timeout = connection.getRequestTimeout(true);
       expect(timeout).toEqual(100);
@@ -107,10 +107,10 @@ describe('Connection', () => {
 
   describe('portMessage()', () => {
     it('should call console.log if debug enabled', () => {
-      const connection = new Connection({debug: true});
+      const connection = new Connection({ debug: true });
       spyOn(console, 'log');
       //@ts-ignore
-      connection.port = {postMessage: () => {}};
+      connection.port = { postMessage: () => {} };
       //@ts-ignore
       connection.portMessage(MESSAGE_TYPE.EMIT);
       expect(console.log).toHaveBeenCalled();

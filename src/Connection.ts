@@ -103,6 +103,7 @@ export class Connection {
    * Indicates if a connection has been established
    */
   public connected: boolean = false;
+  public id!: string | null;
   protected port!: MessagePort;
   private backlog: Array<Message> = [];
   protected promises: Promises = {};
@@ -110,7 +111,7 @@ export class Connection {
   protected options: ConnectionSettings;
   protected connectionTimeout!: number;
   protected connectionStep: string = '';
-  protected clientInitListener!: any;
+  protected messageListener!: any;
   protected readonly defaultOptions: ConnectionSettings = {
     window: window,
     connectionTimeout: 2000,
@@ -212,8 +213,8 @@ export class Connection {
       this.port.close();
       this.connected = false;
     }
-    if (this.clientInitListener) {
-      this.options.window.removeEventListener('message', this.clientInitListener, false);
+    if (this.messageListener) {
+      this.options.window.removeEventListener('message', this.messageListener, false);
     }
   }
 
@@ -221,8 +222,8 @@ export class Connection {
     clearTimeout(this.connectionTimeout);
     if (this.options.connectionTimeout !== false) {
       this.connectionTimeout = window.setTimeout(() => {
-        if (this.clientInitListener) {
-          this.options.window.removeEventListener('message', this.clientInitListener, false);
+        if (this.messageListener) {
+          this.options.window.removeEventListener('message', this.messageListener, false);
         }
         this.handleMessage({
           type: MESSAGE_TYPE.EMIT,
@@ -256,6 +257,9 @@ export class Connection {
   protected finishInit() {
     this.connected = true;
     this.clearConnectionTimeout();
+    if (this.options.debug) {
+      console.log(`Finished connection on ${this.isClient() ? 'client' : 'server'}`);
+    }
     this.emit(MC_EVENTS.CONNECTED);
     this.completeBacklog();
   }

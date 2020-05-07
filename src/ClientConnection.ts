@@ -8,7 +8,7 @@ enum CONNECTION_STEPS {
  * The child side of a connection.
  */
 export class ClientConnection extends Connection {
-  private messageListener: any;
+  protected messageListener: any;
   constructor(options: any = {}) {
     super(options);
     this.messageListener = (e: MessageEvent) => this.messageHandler(e);
@@ -21,11 +21,11 @@ export class ClientConnection extends Connection {
 
   public init() {
     const url = new URL(this.options.window.location.toString());
-    const id = url.searchParams.get('mc-name');
+    this.id = url.searchParams.get('mc-name');
     if (this.options.debug) {
-      console.log('Client: sent postMessage value:', id);
+      console.log('Client: sent postMessage value:', this.id);
     }
-    this.options.window.parent.postMessage(id, this.options.targetOrigin);
+    this.options.window.parent.postMessage(this.id, this.options.targetOrigin);
   }
 
   private messageHandler(e: MessageEvent) {
@@ -42,7 +42,7 @@ export class ClientConnection extends Connection {
       this.connectionStep = CONNECTION_STEPS.HANDSHAKE;
       this.setConnectionTimeout();
     }
-    this.request(MC_EVENTS.HANDSHAKE)
+    this.request(MC_EVENTS.HANDSHAKE, null, { timeout: false })
       .then(() => {
         this.addBeforeUnloadEvent();
         this.finishInit();
@@ -55,6 +55,7 @@ export class ClientConnection extends Connection {
   protected addBeforeUnloadEvent() {
     this.options.window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
       this.emit(MC_EVENTS.DISCONNECTED);
+      this.close();
     });
   }
 
