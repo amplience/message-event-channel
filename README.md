@@ -88,7 +88,7 @@ frame.src = "./frame.html";
 ```ts
 import { ClientConnection } from 'message-event-channel';
 const connection = new ClientConnection();
-connection.on('some-payload', (payload, resolve, reject)=>{
+connection.on('some-data', (payload, resolve, reject)=>{
   resolve({hello: 'world'})
 });
 ```
