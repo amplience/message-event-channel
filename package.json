@@ -98,7 +98,7 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "url-polyfill": "^1.1.7"
+    "url-polyfill": "^1.1.12"
   },
   "publishConfig": {
     "access": "public"
