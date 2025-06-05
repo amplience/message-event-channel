@@ -8,9 +8,41 @@ describe('Connection', () => {
   });
 
   describe('on()', () => {
+    it('should register callback', () => {
+      const connection = new Connection();
+      const cb = jasmine.createSpy('cb');
+
+      connection.on('callme', cb);
+
+      (connection as any).handleMessage({
+        type: MESSAGE_TYPE.EMIT,
+        event: 'callme',
+        payload: {}
+      });
+
+      expect(cb).toHaveBeenCalled();
+    });
     it('should return itself', () => {
       const connection = new Connection();
       expect(connection.on('blah', () => {})).toBe(connection);
+    });
+  });
+
+  describe('off()', () => {
+    it('should remove callback', () => {
+      const connection = new Connection();
+      const cb = jasmine.createSpy('cb');
+
+      connection.on('remove', cb);
+      connection.off('remove', cb);
+
+      (connection as any).handleMessage({
+        type: MESSAGE_TYPE.EMIT,
+        event: 'remove',
+        payload: {}
+      });
+
+      expect(cb).not.toHaveBeenCalled();
     });
   });
 
