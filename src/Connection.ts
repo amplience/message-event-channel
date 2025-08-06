@@ -167,6 +167,19 @@ export class Connection {
   }
 
   /**
+   * Unbind a callback from an event
+   * @param event The name of the event to remove the callback from
+   * @param callback The callback to remove
+   * @returns
+   */
+  public off(event: string, callback: Function) {
+    if (this.emitters[event]) {
+      this.emitters[event] = this.emitters[event].filter(cb => cb !== callback);
+    }
+    return this;
+  }
+
+  /**
    * Make a request of the counterpart. It will automatically reject the promise if the timeout time is exceeded.
    * @param event The name of the event to emit
    * @param payload Payload to be sent with the request
