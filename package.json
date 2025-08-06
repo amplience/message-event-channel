@@ -1,7 +1,7 @@
 {
   "name": "message-event-channel",
   "umd": "mc",
-  "version": "0.0.0-development",
+  "version": "1.2.0",
   "description": "",
   "keywords": [],
   "main": "dist/message-event-channel.umd.js",
